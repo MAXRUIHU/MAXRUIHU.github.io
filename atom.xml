@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2021-12-20T02:34:14.005Z</updated>
+  <updated>2021-12-21T09:37:20.139Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Basic Quantitive Methods</title>
+    <link href="http://example.com/2021/12/21/Basic-Quantitive-Methods/"/>
+    <id>http://example.com/2021/12/21/Basic-Quantitive-Methods/</id>
+    <published>2021-12-21T09:19:35.000Z</published>
+    <updated>2021-12-21T09:37:20.139Z</updated>
+    
+    <content type="html"><![CDATA[<h2>在这篇博客中我将分享一些基础的量化策略，我会告诉你这个策略是什么，背后的金融原理是什么和策略的适用范围。<span id="more"></span>]]></content>
+    
+    
+    <summary type="html">&lt;h2&gt;在这篇博客中我将分享一些基础的量化策略，我会告诉你这个策略是什么，背后的金融原理是什么和策略的适用范围。</summary>
+    
+    
+    
+    <category term="Quantitive Methods" scheme="http://example.com/categories/Quantitive-Methods/"/>
+    
+    
+    <category term="basic quantitive methods" scheme="http://example.com/tags/basic-quantitive-methods/"/>
+    
+    <category term="finance" scheme="http://example.com/tags/finance/"/>
+    
+  </entry>
   
   <entry>
     <title>WHO AM I</title>
