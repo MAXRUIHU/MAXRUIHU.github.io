@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2021-12-23T06:11:43.830Z</updated>
+  <updated>2021-12-28T14:41:13.585Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OpenCV-Day1</title>
+    <link href="http://example.com/2021/12/28/OpenCV-Day1/"/>
+    <id>http://example.com/2021/12/28/OpenCV-Day1/</id>
+    <published>2021-12-28T14:13:36.000Z</published>
+    <updated>2021-12-28T14:41:13.585Z</updated>
+    
+    <content type="html"><![CDATA[<p>每天学习opencv - day1</p><span id="more"></span><h2 id="准备工作">准备工作</h2><p>我使用的是pycharm， 直接在Package里面安装opencv-python和opencv-contrib-python两个包。</p><p><img src="image/OpenCV-Day1/1640701391476.png" alt="img"></p><h2 id="基础学习">基础学习</h2><h3 id="图片操作">图片操作</h3><h4 id="读取图片">读取图片</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img = cv2.imread(<span class="string">&#x27;image/1.jpg&#x27;</span>)</span><br></pre></td></tr></table></figure><h4 id="图片展示">图片展示</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义一个函数展示图片</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cv_show</span>(<span class="params">name, img</span>):</span></span><br><span class="line">    cv2.imshow(name, img)   <span class="comment">## 展示图片</span></span><br><span class="line">    cv2.waitKey(<span class="number">0</span>)          <span class="comment">## 0表示任意键终止</span></span><br><span class="line">    cv2.destroyAllWindows()  <span class="comment">## 关掉窗口</span></span><br></pre></td></tr></table></figure><h4 id="读取灰度图片">读取灰度图片</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">img1 = cv2.imread(<span class="string">&#x27;image/1.jpg&#x27;</span>, cv2.IMREAD_GRAYSCALE)</span><br></pre></td></tr></table></figure><h4 id="图片保存">图片保存</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cv2.imwrite(<span class="string">&#x27;image/Tesla_gray.jpg&#x27;</span>, img1)</span><br></pre></td></tr></table></figure><h4 id="获取部分图像数据">获取部分图像数据</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">imgcut = img[<span class="number">0</span>:<span class="number">500</span>, <span class="number">0</span>:<span class="number">800</span>]</span><br></pre></td></tr></table></figure><h4 id="颜色通道提取">颜色通道提取</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b, g, r = cv2.split(img)</span><br></pre></td></tr></table></figure><h4 id="只保留某一通道">只保留某一通道</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 只保留R， 图像格式是BGR， opencv默认是RGB， 数组可以看作[0, 1, 2]</span></span><br><span class="line">cur_img0 = img.copy()</span><br><span class="line">cur_img0[:, :, <span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">cur_img0[:, :, <span class="number">1</span>] = <span class="number">0</span></span><br><span class="line">cv_show(<span class="string">&#x27;R&#x27;</span>, cur_img0)</span><br></pre></td></tr></table></figure><h3 id="视频操作">视频操作</h3><h4 id="读取视频">读取视频</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vc = cv2.VideoCapture(<span class="string">&#x27;video/1.wmv&#x27;</span>)</span><br></pre></td></tr></table></figure><h4 id="检查是否读取顺利">检查是否读取顺利</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> vc.isOpened():</span><br><span class="line">    <span class="built_in">open</span>, frame = vc.read()</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">open</span> = <span class="literal">False</span></span><br></pre></td></tr></table></figure><h4 id="遍历视频的每一帧">遍历视频的每一帧</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> <span class="built_in">open</span>:</span><br><span class="line">    ret, frame = vc.read()</span><br><span class="line">    <span class="keyword">if</span> frame <span class="keyword">is</span> <span class="literal">None</span>:      <span class="comment">#如果为空，则跳出循环</span></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> ret == <span class="literal">True</span>:</span><br><span class="line">        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)   <span class="comment">#将每一帧转化为灰度图</span></span><br><span class="line">        cv2.imshow(<span class="string">&#x27;result&#x27;</span>, gray)</span><br><span class="line">        <span class="keyword">if</span> cv2.waitKey(<span class="number">20</span>) &amp; <span class="number">0xFF</span> == <span class="number">27</span>:                <span class="comment"># 27表示推出键</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">vc.release()</span><br><span class="line">cv2.destroyAllWindows()</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;每天学习opencv - day1&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="opencv" scheme="http://example.com/categories/opencv/"/>
+    
+    <category term="day 1" scheme="http://example.com/categories/opencv/day-1/"/>
+    
+    
+    <category term="opencv" scheme="http://example.com/tags/opencv/"/>
+    
+  </entry>
   
   <entry>
     <title>Basic Quantitive Methods</title>
