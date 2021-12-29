@@ -20,15 +20,20 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Max&#39;s Blog">
-<meta property="og:url" content="http://example.com/tags/finance/index.html">
+  <meta name="description" content="每天学习opencv - day2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV-Day2">
+<meta property="og:url" content="http://example.com/2021/12/30/OpenCV-Day2/index.html">
 <meta property="og:site_name" content="Max&#39;s Blog">
+<meta property="og:description" content="每天学习opencv - day2">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-12-29T16:05:18.000Z">
+<meta property="article:modified_time" content="2021-12-29T16:11:04.815Z">
 <meta property="article:author" content="Max">
+<meta property="article:tag" content="opencv">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/tags/finance/">
+<link rel="canonical" href="http://example.com/2021/12/30/OpenCV-Day2/">
 
 
 <script id="page-configurations">
@@ -36,12 +41,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 
-  <title>Tag: finance | Max's Blog</title>
+  <title>OpenCV-Day2 | Max's Blog</title>
   
 
 
@@ -183,51 +188,129 @@
         <div class="content-wrap">
           
 
-          <div class="content tag">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        <h2 class="collection-header">finance
-          <small>Tag</small>
-        </h2>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/12/30/OpenCV-Day2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Avatar.jpg">
+      <meta itemprop="name" content="Max">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Max's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OpenCV-Day2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2021-12-30 00:05:18 / Modified: 00:11:04" itemprop="dateCreated datePublished" datetime="2021-12-30T00:05:18+08:00">2021-12-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/opencv/" itemprop="url" rel="index"><span itemprop="name">opencv</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/opencv/day-2/" itemprop="url" rel="index"><span itemprop="name">day 2</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>567</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2021</span>
+        <p>每天学习opencv - day2</p>
+<span id="more"></span>
+<h3 id="数值计算">数值计算</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 数值计算</span></span><br><span class="line">img2 = img + <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 相当于每个像素点都比以前的像素加10</span></span><br><span class="line"><span class="built_in">print</span>(img[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"><span class="built_in">print</span>(img2[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 相当于 %256 取整</span></span><br><span class="line"><span class="built_in">print</span>((img + img2)[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># add 函数两个矩阵相加， 只取最大不超过255</span></span><br><span class="line"><span class="built_in">print</span>(cv2.add(img, img2)[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br></pre></td></tr></table></figure>
+<h3 id="图像融合">图像融合</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 两个融合的图像数值要相同</span></span><br><span class="line"><span class="built_in">print</span>(img.shape) <span class="comment">### (872, 1436, 3)</span></span><br><span class="line"><span class="built_in">print</span>(img1.shape) <span class="comment">### (4032, 3024, 3)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># reshape操作</span></span><br><span class="line"><span class="comment">## 注意顺序</span></span><br><span class="line">img3 = cv2.resize(img1, (<span class="number">1436</span>, <span class="number">872</span>)) </span><br><span class="line"></span><br><span class="line"><span class="comment"># 按照权重将图片融合(dst = src1*alpha + src2*beta + gamma;, gamma是亮度级进行微调)</span></span><br><span class="line">res = cv2.addWeighted(img, <span class="number">0.4</span>, img3, <span class="number">0.6</span>, <span class="number">0</span>)</span><br><span class="line">plt.imshow(res)</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将图片重新设置size</span></span><br><span class="line">res1 = cv2.resize(img1, (<span class="number">0</span>, <span class="number">0</span>), fx = <span class="number">10</span>, fy = <span class="number">1</span>)</span><br><span class="line">plt.imshow(res1)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+    
+    
+    
+        
 
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2021-12-21T17:19:35+08:00"
-              content="2021-12-21">
-          12-21
-        </time>
-      </div>
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>Post author:  </strong>Max
+  </li>
+  <li class="post-copyright-link">
+    <strong>Post link: </strong>
+    <a href="http://example.com/2021/12/30/OpenCV-Day2/" title="OpenCV-Day2">http://example.com/2021/12/30/OpenCV-Day2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>Copyright Notice:  </strong>All articles in this blog are licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> unless stating additionally.
+  </li>
+</ul>
+</div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/2021/12/21/Basic-Quantitive-Methods/" itemprop="url">
-            <span itemprop="name">Basic Quantitive Methods</span>
-          </a>
-      </div>
 
-    </header>
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/opencv/" rel="tag"># opencv</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/28/OpenCV-Day1/" rel="prev" title="OpenCV-Day1">
+      <i class="fa fa-chevron-left"></i> OpenCV-Day1
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
   </article>
-
-    </div>
-  </div>
   
   
-  
-
   
 
 
@@ -280,6 +363,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%80%BC%E8%AE%A1%E7%AE%97"><span class="nav-number">1.</span> <span class="nav-text">数值计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E5%83%8F%E8%9E%8D%E5%90%88"><span class="nav-number">2.</span> <span class="nav-text">图像融合</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
