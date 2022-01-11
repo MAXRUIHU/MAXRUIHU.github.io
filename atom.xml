@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2021-12-30T08:41:23.848Z</updated>
+  <updated>2022-01-11T08:46:36.132Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OpenCV-Day4</title>
+    <link href="http://example.com/2022/01/11/OpenCV-Day4/"/>
+    <id>http://example.com/2022/01/11/OpenCV-Day4/</id>
+    <published>2022-01-11T06:53:34.000Z</published>
+    <updated>2022-01-11T08:46:36.132Z</updated>
+    
+    <content type="html"><![CDATA[<p>每天学习opencv - day4</p><span id="more"></span><h2 id="形态学">形态学</h2><h3 id="腐蚀操作">腐蚀操作</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 内核，定义边界范围[3,3]矩阵</span></span><br><span class="line">kernel = np.ones((<span class="number">10</span>,<span class="number">10</span>), np.uint8)</span><br><span class="line"><span class="comment"># 腐蚀函数</span></span><br><span class="line">erosion1 = cv2.erode(img, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">erosion2 = cv2.erode(img, kernel, iterations=<span class="number">4</span>)</span><br><span class="line">erosion3 = cv2.erode(img, kernel, iterations=<span class="number">8</span>)</span><br><span class="line">res = np.hstack((img, erosion1, erosion2, erosion3))</span><br><span class="line">cv_show(<span class="string">&#x27;res&#x27;</span>, res)</span><br></pre></td></tr></table></figure><p><img src="F:%5CpythonProject%5Cimage%5Cerosion.jpg" alt="erosion"></p><h3 id="膨胀操作">膨胀操作</h3><p>膨胀操作就是腐蚀操作的反向</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dilate1 = cv2.dilate(erosion2, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">dilate2 = cv2.dilate(erosion2, kernel, iterations=<span class="number">4</span>)</span><br><span class="line">dilate3 = cv2.dilate(erosion2, kernel, iterations=<span class="number">8</span>)</span><br><span class="line">dil = np.hstack((img, erosion2, dilate2))</span><br><span class="line">cv_show(<span class="string">&#x27;dilate&#x27;</span>, dil)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/dilate.jpg&#x27;</span>, dil)</span><br></pre></td></tr></table></figure><p><img src="F:%5CpythonProject%5Cimage%5Cdilate.jpg" alt="dilate"></p><h3 id="开运算和闭运算">开运算和闭运算</h3><p>开运算：先腐蚀，在膨胀</p><p>闭运算：先膨胀，再腐蚀</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">img_max = cv2.imread(<span class="string">&quot;image\Max.png&quot;</span>)</span><br><span class="line">opening = cv2.morphologyEx(img_max, cv2.MORPH_OPEN, kernel)</span><br><span class="line">closing = cv2.morphologyEx(img_max, cv2.MORPH_CLOSE, kernel)</span><br><span class="line">openclose = np.hstack((img_max, opening, closing))</span><br><span class="line">cv_show(<span class="string">&#x27;open and close&#x27;</span>, openclose)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/openclose.jpg&#x27;</span>, openclose)</span><br></pre></td></tr></table></figure><p><img src="F:%5CpythonProject%5Cimage%5Copenclose.jpg" alt="openclose"></p><h3 id="梯度运算">梯度运算</h3><p>梯度运算 = 腐蚀 - 膨胀</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gradient = cv2.morphologyEx(img, cv2.MORPH_GRADIENT, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">gra = np.hstack((img, erosion1, dilate1, gradient))</span><br><span class="line">cv_show(<span class="string">&#x27;gradient&#x27;</span>, gra)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/gradient.jpg&#x27;</span>, gra)</span><br></pre></td></tr></table></figure><p><img src="F:%5CpythonProject%5Cimage%5Cgradient.jpg" alt="gradient"></p><h3 id="礼帽和黑帽">礼帽和黑帽</h3><p>礼帽 ：原始输入 - 开运算结果</p><p>黑帽 ： 闭运算 - 原始输入</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tophat = cv2.morphologyEx(img_max, cv2.MORPH_TOPHAT, kernel)</span><br><span class="line">blackhat = cv2.morphologyEx(img_max, cv2.MORPH_BLACKHAT, kernel)</span><br><span class="line">hat = np.hstack((img_max, tophat, blackhat))</span><br><span class="line">cv_show(&#x27;hat&#x27;, hat)</span><br><span class="line">cv2.imwrite(&#x27;image/hat.jpg&#x27;, hat)</span><br></pre></td></tr></table></figure><p><img src="F:%5CpythonProject%5Cimage%5Chat.jpg" alt="hat"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;每天学习opencv - day4&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="opencv" scheme="http://example.com/categories/opencv/"/>
+    
+    <category term="day 4" scheme="http://example.com/categories/opencv/day-4/"/>
+    
+    
+    <category term="opencv" scheme="http://example.com/tags/opencv/"/>
+    
+  </entry>
   
   <entry>
     <title>OpenCV-Day3</title>
