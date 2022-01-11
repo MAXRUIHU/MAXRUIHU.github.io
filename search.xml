@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Time Series Analyisis and Its Application - Course 1</title>
+    <url>/2022/01/11/6012Lab1/</url>
+    <content><![CDATA[<p>Example 1.1 JJ Quarterly Earnings</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">library(astsa)</span><br><span class="line">plot(jj, type = &quot;o&quot;, ylab = &quot;Quarterly Earning Per Share&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.2 Global Warming</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">plot(globtemp, type = &quot;o&quot;, ylab = &quot;Global Temperature Deviations&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.3 Speech Data</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">plot(speech)</span><br></pre></td></tr></table></figure>
+<p>Example 1.4 Dow Jones Industrial Average</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">library(TTR)</span><br><span class="line">djia = getYahooData(&quot;^DJI&quot;, start = 20010101, end = 20220101, freq = &quot;daily&quot;)</span><br><span class="line">plot(djia)</span><br></pre></td></tr></table></figure>
+<p>Example 1.5 El Nino</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(soi, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Southern Oscillation Index&quot;)</span><br><span class="line">plot(rec, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Recruitment&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.6 fMRI Imaging</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">ts.plot(fmri1[,2:5], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Cortex&quot;)</span><br><span class="line">ts.plot(fmri1[,6:9], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Thalamus &amp; Cerebellum&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.7 Earthquakes and Explosion</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(EQ5, main = &quot;Earthquake&quot;)</span><br><span class="line">plot(EXP6, main = &quot;Explosion&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.8 White Noise</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.9 Moving Average and Filter</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.10 Autoregressions</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">w = rnorm(550, 0, 1)</span><br><span class="line">x = filter(w, filter = c(1, -.9), method = &quot;recursive&quot;)[-(1:50)] # Remove first 50</span><br><span class="line">plot.ts(x, main = &quot;autoregression&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.11 Random Walk with Drift</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">set.seed(154) # so you can reproduce the results</span><br><span class="line">w = rnorm(200); x = cumsum(w) # two commands in one line</span><br><span class="line"></span><br><span class="line">wd = w +.2;  xd = cumsum(wd) # </span><br><span class="line"></span><br><span class="line">par(mfrow=c(1,1)) # </span><br><span class="line"></span><br><span class="line">plot.ts(xd, ylim=c(-5,55), main=&quot;random walk&quot;, ylab=&#x27;&#x27;)</span><br><span class="line"></span><br><span class="line">lines(x, col=4); abline(h=0, col=4, lty=2); abline(a=0, b=.2, lty=2)</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Time Series</category>
+        <category>chapter 1</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Time Series</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Basic Quantitive Methods</title>
     <url>/2021/12/21/Basic-Quantitive-Methods/</url>
     <content><![CDATA[<h2>在这篇博客中我将分享一些基础的量化股票交易策略。
@@ -134,6 +169,24 @@ $\alpha$ &gt; 0时，说明股票收益率高于均衡水平，股票价格被�
       </tags>
   </entry>
   <entry>
+    <title>OpenCV-Day2</title>
+    <url>/2021/12/30/OpenCV-Day2/</url>
+    <content><![CDATA[<p>每天学习opencv - day2</p>
+<span id="more"></span>
+<h3 id="数值计算">数值计算</h3>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 数值计算</span></span><br><span class="line">img2 = img + <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 相当于每个像素点都比以前的像素加10</span></span><br><span class="line"><span class="built_in">print</span>(img[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"><span class="built_in">print</span>(img2[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 相当于 %256 取整</span></span><br><span class="line"><span class="built_in">print</span>((img + img2)[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># add 函数两个矩阵相加， 只取最大不超过255</span></span><br><span class="line"><span class="built_in">print</span>(cv2.add(img, img2)[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br></pre></td></tr></table></figure>
+<h3 id="图像融合">图像融合</h3>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 两个融合的图像数值要相同</span></span><br><span class="line"><span class="built_in">print</span>(img.shape) <span class="comment">### (872, 1436, 3)</span></span><br><span class="line"><span class="built_in">print</span>(img1.shape) <span class="comment">### (4032, 3024, 3)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># reshape操作</span></span><br><span class="line"><span class="comment">## 注意顺序</span></span><br><span class="line">img3 = cv2.resize(img1, (<span class="number">1436</span>, <span class="number">872</span>)) </span><br><span class="line"></span><br><span class="line"><span class="comment"># 按照权重将图片融合(dst = src1*alpha + src2*beta + gamma;, gamma是亮度级进行微调)</span></span><br><span class="line">res = cv2.addWeighted(img, <span class="number">0.4</span>, img3, <span class="number">0.6</span>, <span class="number">0</span>)</span><br><span class="line">plt.imshow(res)</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将图片重新设置size</span></span><br><span class="line">res1 = cv2.resize(img1, (<span class="number">0</span>, <span class="number">0</span>), fx = <span class="number">10</span>, fy = <span class="number">1</span>)</span><br><span class="line">plt.imshow(res1)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>opencv</category>
+        <category>day 2</category>
+      </categories>
+      <tags>
+        <tag>opencv</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>OpenCV-Day1</title>
     <url>/2021/12/28/OpenCV-Day1/</url>
     <content><![CDATA[<p>每天学习opencv - day1</p>
@@ -168,24 +221,6 @@ $\alpha$ &gt; 0时，说明股票收益率高于均衡水平，股票价格被�
       <categories>
         <category>opencv</category>
         <category>day 1</category>
-      </categories>
-      <tags>
-        <tag>opencv</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>OpenCV-Day2</title>
-    <url>/2021/12/30/OpenCV-Day2/</url>
-    <content><![CDATA[<p>每天学习opencv - day2</p>
-<span id="more"></span>
-<h3 id="数值计算">数值计算</h3>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 数值计算</span></span><br><span class="line">img2 = img + <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 相当于每个像素点都比以前的像素加10</span></span><br><span class="line"><span class="built_in">print</span>(img[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"><span class="built_in">print</span>(img2[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 相当于 %256 取整</span></span><br><span class="line"><span class="built_in">print</span>((img + img2)[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># add 函数两个矩阵相加， 只取最大不超过255</span></span><br><span class="line"><span class="built_in">print</span>(cv2.add(img, img2)[<span class="number">1</span>:<span class="number">10</span>, <span class="number">1</span>:<span class="number">10</span>, <span class="number">0</span>])</span><br></pre></td></tr></table></figure>
-<h3 id="图像融合">图像融合</h3>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 两个融合的图像数值要相同</span></span><br><span class="line"><span class="built_in">print</span>(img.shape) <span class="comment">### (872, 1436, 3)</span></span><br><span class="line"><span class="built_in">print</span>(img1.shape) <span class="comment">### (4032, 3024, 3)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># reshape操作</span></span><br><span class="line"><span class="comment">## 注意顺序</span></span><br><span class="line">img3 = cv2.resize(img1, (<span class="number">1436</span>, <span class="number">872</span>)) </span><br><span class="line"></span><br><span class="line"><span class="comment"># 按照权重将图片融合(dst = src1*alpha + src2*beta + gamma;, gamma是亮度级进行微调)</span></span><br><span class="line">res = cv2.addWeighted(img, <span class="number">0.4</span>, img3, <span class="number">0.6</span>, <span class="number">0</span>)</span><br><span class="line">plt.imshow(res)</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将图片重新设置size</span></span><br><span class="line">res1 = cv2.resize(img1, (<span class="number">0</span>, <span class="number">0</span>), fx = <span class="number">10</span>, fy = <span class="number">1</span>)</span><br><span class="line">plt.imshow(res1)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>opencv</category>
-        <category>day 2</category>
       </categories>
       <tags>
         <tag>opencv</tag>

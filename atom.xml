@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-01-11T08:46:36.132Z</updated>
+  <updated>2022-01-11T09:41:54.229Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,35 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Time Series Analyisis and Its Application - Course 1</title>
+    <link href="http://example.com/2022/01/11/6012Lab1/"/>
+    <id>http://example.com/2022/01/11/6012Lab1/</id>
+    <published>2022-01-11T09:38:45.000Z</published>
+    <updated>2022-01-11T09:41:54.229Z</updated>
+    
+    <content type="html"><![CDATA[<p>Example 1.1 JJ Quarterly Earnings</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">library(astsa)</span><br><span class="line">plot(jj, type = &quot;o&quot;, ylab = &quot;Quarterly Earning Per Share&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.2 Global Warming</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot(globtemp, type = &quot;o&quot;, ylab = &quot;Global Temperature Deviations&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.3 Speech Data</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot(speech)</span><br></pre></td></tr></table></figure><p>Example 1.4 Dow Jones Industrial Average</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">library(TTR)</span><br><span class="line">djia = getYahooData(&quot;^DJI&quot;, start = 20010101, end = 20220101, freq = &quot;daily&quot;)</span><br><span class="line">plot(djia)</span><br></pre></td></tr></table></figure><p>Example 1.5 El Nino</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(soi, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Southern Oscillation Index&quot;)</span><br><span class="line">plot(rec, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Recruitment&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.6 fMRI Imaging</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">ts.plot(fmri1[,2:5], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Cortex&quot;)</span><br><span class="line">ts.plot(fmri1[,6:9], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Thalamus &amp; Cerebellum&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.7 Earthquakes and Explosion</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(EQ5, main = &quot;Earthquake&quot;)</span><br><span class="line">plot(EXP6, main = &quot;Explosion&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.8 White Noise</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.9 Moving Average and Filter</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.10 Autoregressions</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">w = rnorm(550, 0, 1)</span><br><span class="line">x = filter(w, filter = c(1, -.9), method = &quot;recursive&quot;)[-(1:50)] # Remove first 50</span><br><span class="line">plot.ts(x, main = &quot;autoregression&quot;)</span><br></pre></td></tr></table></figure><p>Example 1.11 Random Walk with Drift</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">set.seed(154) # so you can reproduce the results</span><br><span class="line">w = rnorm(200); x = cumsum(w) # two commands in one line</span><br><span class="line"></span><br><span class="line">wd = w +.2;  xd = cumsum(wd) # </span><br><span class="line"></span><br><span class="line">par(mfrow=c(1,1)) # </span><br><span class="line"></span><br><span class="line">plot.ts(xd, ylim=c(-5,55), main=&quot;random walk&quot;, ylab=&#x27;&#x27;)</span><br><span class="line"></span><br><span class="line">lines(x, col=4); abline(h=0, col=4, lty=2); abline(a=0, b=.2, lty=2)</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;Example 1.1 JJ Quarterly Earnings&lt;/p&gt;
+&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;</summary>
+      
+    
+    
+    
+    <category term="Time Series" scheme="http://example.com/categories/Time-Series/"/>
+    
+    <category term="chapter 1" scheme="http://example.com/categories/Time-Series/chapter-1/"/>
+    
+    
+    <category term="R" scheme="http://example.com/tags/R/"/>
+    
+    <category term="Time Series" scheme="http://example.com/tags/Time-Series/"/>
+    
+  </entry>
   
   <entry>
     <title>OpenCV-Day4</title>
