@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-01-11T09:41:54.229Z</updated>
+  <updated>2022-01-13T08:22:37.278Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>OpenCV-Day5</title>
+    <link href="http://example.com/2022/01/12/OpenCV-Day5/"/>
+    <id>http://example.com/2022/01/12/OpenCV-Day5/</id>
+    <published>2022-01-11T16:16:08.000Z</published>
+    <updated>2022-01-13T08:22:37.278Z</updated>
+    
+    <content type="html"><![CDATA[<p>每天学习opencv - day5</p><span id="more"></span><h2 id="图像梯度计算">图像梯度计算</h2><h3 id="Soble算子">Soble算子</h3><p>cv2.Sobel(src, ddepth, dx, dy, ksize)</p><p>ddepth:图像深度， dx和dy分别表示水平和竖直方向，ksize是Sobel算子的大小</p><p>soblex = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=3)<br>$$<br>\left[<br>\begin{matrix}<br>-1 &amp; 0 &amp; 1\<br>-1 &amp; 0 &amp; 1 \<br>-1 &amp; 0 &amp; 1<br>\end{matrix}<br>\right]<br>\tag{soble}<br>$$<br>白到黑是负数， 黑到白就是正数，所有复数都会被截断成0</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 白到黑是负数， 黑到白就是正数，所有复数都会被截断成0，所以要求绝对值</span></span><br><span class="line">soblex = cv2.Sobel(img, cv2.CV_64F, <span class="number">1</span>, <span class="number">0</span>, ksize=<span class="number">3</span>)</span><br><span class="line">soblex = cv2.convertScaleAbs(soblex)</span><br><span class="line"><span class="comment"># cv_show(&#x27;soblex&#x27;, soblex)</span></span><br><span class="line"></span><br><span class="line">sobley = cv2.Sobel(img, cv2.CV_64F, <span class="number">0</span>, <span class="number">1</span>, ksize=<span class="number">3</span>)</span><br><span class="line">sobley = cv2.convertScaleAbs(sobley)</span><br><span class="line"><span class="comment"># cv_show(&#x27;sobley&#x27;, sobley)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 分别计算x,y，再求和</span></span><br><span class="line">soblexy = cv2.addWeighted(soblex, <span class="number">0.5</span>, sobley, <span class="number">0.5</span>, <span class="number">0</span>)</span><br><span class="line"><span class="comment"># cv_show(&#x27;soblexy&#x27;, soblexy)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 不建议直接计算</span></span><br><span class="line">soblexy1 = cv2.Sobel(img, cv2.CV_64F, <span class="number">1</span>, <span class="number">1</span>, ksize=<span class="number">3</span>)</span><br><span class="line">soblexy1 = cv2.convertScaleAbs(soblexy1)</span><br><span class="line"><span class="comment"># cv_show(&#x27;soblexy&#x27;, soblexy1)</span></span><br><span class="line"></span><br><span class="line">res = np.hstack((img, soblex, sobley, soblexy, soblexy1))</span><br><span class="line">cv_show(<span class="string">&#x27;res&#x27;</span>, res)</span><br></pre></td></tr></table></figure><p><img src="F:%5CMyblog%5Cblog%5Csource_posts%5COpenCV-Day5%5C1.jpg" alt="soble"></p><h3 id="Scharr和Laplacian算子">Scharr和Laplacian算子</h3><p>Scharr算子 ： 越近权重越大,更敏感</p><p>Laplacian算子 ： 二阶导，对噪音点比较明显<br>$$<br>\left[<br>\begin{matrix}<br>-1 &amp; 0 &amp; 1\<br>-4 &amp; 0 &amp; 4 \<br>-1 &amp; 0 &amp; 1<br>\end{matrix}<br>\right]<br>\tag{Scharr}<br>$$</p><p>$$<br>\left[<br>\begin{matrix}<br>0 &amp; -1 &amp; 0\<br>-1 &amp;  4 &amp; -1\<br>0 &amp; -1 &amp; 0<br>\end{matrix}<br>\right]<br>\tag{Laplacian}<br>$$</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">scharrx = cv2.Scharr(img,cv2.CV_64F, <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">scharry = cv2.Scharr(img,cv2.CV_64F, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">scharrx = cv2.convertScaleAbs(scharrx)</span><br><span class="line">scharry = cv2.convertScaleAbs(scharry)</span><br><span class="line">scharrxy = cv2.addWeighted(scharrx, <span class="number">0.5</span>, scharry, <span class="number">0.5</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">laplacian = cv2.Laplacian(img, cv2.CV_64F)</span><br><span class="line">laplacian = cv2.convertScaleAbs(laplacian)</span><br><span class="line"></span><br><span class="line">res1 = np.hstack((img, soblexy, scharrxy, laplacian))</span><br><span class="line">cv_show(<span class="string">&#x27;com&#x27;</span>, res1)</span><br></pre></td></tr></table></figure><p><img src="F:%5CMyblog%5Cblog%5Csource_posts%5COpenCV-Day5%5C2.jpg" alt="2"></p>]]></content>
+    
+    
+    <summary type="html">&lt;p&gt;每天学习opencv - day5&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="opencv" scheme="http://example.com/categories/opencv/"/>
+    
+    <category term="day 5" scheme="http://example.com/categories/opencv/day-5/"/>
+    
+    
+    <category term="opencv" scheme="http://example.com/tags/opencv/"/>
+    
+  </entry>
   
   <entry>
     <title>Time Series Analyisis and Its Application - Course 1</title>
