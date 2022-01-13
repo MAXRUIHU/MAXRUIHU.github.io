@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Time Series Analyisis and Its Application - Course 1</title>
+    <url>/2022/01/11/6012Lab1/</url>
+    <content><![CDATA[<p>Example 1.1 JJ Quarterly Earnings</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">library(astsa)</span><br><span class="line">plot(jj, type = &quot;o&quot;, ylab = &quot;Quarterly Earning Per Share&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.2 Global Warming</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">plot(globtemp, type = &quot;o&quot;, ylab = &quot;Global Temperature Deviations&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.3 Speech Data</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">plot(speech)</span><br></pre></td></tr></table></figure>
+<p>Example 1.4 Dow Jones Industrial Average</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">library(TTR)</span><br><span class="line">djia = getYahooData(&quot;^DJI&quot;, start = 20010101, end = 20220101, freq = &quot;daily&quot;)</span><br><span class="line">plot(djia)</span><br></pre></td></tr></table></figure>
+<p>Example 1.5 El Nino</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(soi, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Southern Oscillation Index&quot;)</span><br><span class="line">plot(rec, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Recruitment&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.6 fMRI Imaging</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">ts.plot(fmri1[,2:5], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Cortex&quot;)</span><br><span class="line">ts.plot(fmri1[,6:9], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Thalamus &amp; Cerebellum&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.7 Earthquakes and Explosion</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(EQ5, main = &quot;Earthquake&quot;)</span><br><span class="line">plot(EXP6, main = &quot;Explosion&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.8 White Noise</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.9 Moving Average and Filter</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.10 Autoregressions</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">w = rnorm(550, 0, 1)</span><br><span class="line">x = filter(w, filter = c(1, -.9), method = &quot;recursive&quot;)[-(1:50)] # Remove first 50</span><br><span class="line">plot.ts(x, main = &quot;autoregression&quot;)</span><br></pre></td></tr></table></figure>
+<p>Example 1.11 Random Walk with Drift</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">set.seed(154) # so you can reproduce the results</span><br><span class="line">w = rnorm(200); x = cumsum(w) # two commands in one line</span><br><span class="line"></span><br><span class="line">wd = w +.2;  xd = cumsum(wd) # </span><br><span class="line"></span><br><span class="line">par(mfrow=c(1,1)) # </span><br><span class="line"></span><br><span class="line">plot.ts(xd, ylim=c(-5,55), main=&quot;random walk&quot;, ylab=&#x27;&#x27;)</span><br><span class="line"></span><br><span class="line">lines(x, col=4); abline(h=0, col=4, lty=2); abline(a=0, b=.2, lty=2)</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Time Series</category>
+        <category>chapter 1</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Time Series</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Basic Quantitive Methods</title>
     <url>/2021/12/21/Basic-Quantitive-Methods/</url>
     <content><![CDATA[<h2>在这篇博客中我将分享一些基础的量化股票交易策略。
@@ -134,41 +169,6 @@ $\alpha$ &gt; 0时，说明股票收益率高于均衡水平，股票价格被�
       </tags>
   </entry>
   <entry>
-    <title>Time Series Analyisis and Its Application - Course 1</title>
-    <url>/2022/01/11/6012Lab1/</url>
-    <content><![CDATA[<p>Example 1.1 JJ Quarterly Earnings</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">library(astsa)</span><br><span class="line">plot(jj, type = &quot;o&quot;, ylab = &quot;Quarterly Earning Per Share&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.2 Global Warming</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">plot(globtemp, type = &quot;o&quot;, ylab = &quot;Global Temperature Deviations&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.3 Speech Data</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">plot(speech)</span><br></pre></td></tr></table></figure>
-<p>Example 1.4 Dow Jones Industrial Average</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">library(TTR)</span><br><span class="line">djia = getYahooData(&quot;^DJI&quot;, start = 20010101, end = 20220101, freq = &quot;daily&quot;)</span><br><span class="line">plot(djia)</span><br></pre></td></tr></table></figure>
-<p>Example 1.5 El Nino</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(soi, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Southern Oscillation Index&quot;)</span><br><span class="line">plot(rec, ylab = &quot;&quot;, xlab = &quot;&quot;, main = &quot;Recruitment&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.6 fMRI Imaging</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">ts.plot(fmri1[,2:5], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Cortex&quot;)</span><br><span class="line">ts.plot(fmri1[,6:9], col = 1:4, ylab = &quot;BOLD&quot;, main = &quot;Thalamus &amp; Cerebellum&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.7 Earthquakes and Explosion</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">par(mfrow = c(2,1))</span><br><span class="line">plot(EQ5, main = &quot;Earthquake&quot;)</span><br><span class="line">plot(EXP6, main = &quot;Explosion&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.8 White Noise</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.9 Moving Average and Filter</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># set.seed(2)  # we can use set.seed to reproduce the results.</span><br><span class="line">w = rnorm(500,0,1) # 500 N(0,1) variates</span><br><span class="line"></span><br><span class="line"># v[i] = f[1] * w[i] + f[2] * w[i-1] + f[3]*w[i-2] = (w[i] + w[i-1] + w[i-2])/3</span><br><span class="line">v = filter(w, sides=2, filter=rep(1/3,3), method=&quot;convolution&quot;) # moving average</span><br><span class="line"></span><br><span class="line">par(mfrow=c(2,1))</span><br><span class="line">plot.ts(w, main=&quot;white noise&quot;)</span><br><span class="line">plot.ts(v, ylim=c(-3,3), main=&quot;moving average&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.10 Autoregressions</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">w = rnorm(550, 0, 1)</span><br><span class="line">x = filter(w, filter = c(1, -.9), method = &quot;recursive&quot;)[-(1:50)] # Remove first 50</span><br><span class="line">plot.ts(x, main = &quot;autoregression&quot;)</span><br></pre></td></tr></table></figure>
-<p>Example 1.11 Random Walk with Drift</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">set.seed(154) # so you can reproduce the results</span><br><span class="line">w = rnorm(200); x = cumsum(w) # two commands in one line</span><br><span class="line"></span><br><span class="line">wd = w +.2;  xd = cumsum(wd) # </span><br><span class="line"></span><br><span class="line">par(mfrow=c(1,1)) # </span><br><span class="line"></span><br><span class="line">plot.ts(xd, ylim=c(-5,55), main=&quot;random walk&quot;, ylab=&#x27;&#x27;)</span><br><span class="line"></span><br><span class="line">lines(x, col=4); abline(h=0, col=4, lty=2); abline(a=0, b=.2, lty=2)</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Time Series</category>
-        <category>chapter 1</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-        <tag>Time Series</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>OpenCV-Day1</title>
     <url>/2021/12/28/OpenCV-Day1/</url>
     <content><![CDATA[<p>每天学习opencv - day1</p>
@@ -203,42 +203,6 @@ $\alpha$ &gt; 0时，说明股票收益率高于均衡水平，股票价格被�
       <categories>
         <category>opencv</category>
         <category>day 1</category>
-      </categories>
-      <tags>
-        <tag>opencv</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>OpenCV-Day4</title>
-    <url>/2022/01/11/OpenCV-Day4/</url>
-    <content><![CDATA[<p>每天学习opencv - day4</p>
-<span id="more"></span>
-<h2 id="形态学">形态学</h2>
-<h3 id="腐蚀操作">腐蚀操作</h3>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 内核，定义边界范围[3,3]矩阵</span></span><br><span class="line">kernel = np.ones((<span class="number">10</span>,<span class="number">10</span>), np.uint8)</span><br><span class="line"><span class="comment"># 腐蚀函数</span></span><br><span class="line">erosion1 = cv2.erode(img, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">erosion2 = cv2.erode(img, kernel, iterations=<span class="number">4</span>)</span><br><span class="line">erosion3 = cv2.erode(img, kernel, iterations=<span class="number">8</span>)</span><br><span class="line">res = np.hstack((img, erosion1, erosion2, erosion3))</span><br><span class="line">cv_show(<span class="string">&#x27;res&#x27;</span>, res)</span><br></pre></td></tr></table></figure>
-<p><img src="F:%5CpythonProject%5Cimage%5Cerosion.jpg" alt="erosion"></p>
-<h3 id="膨胀操作">膨胀操作</h3>
-<p>膨胀操作就是腐蚀操作的反向</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">dilate1 = cv2.dilate(erosion2, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">dilate2 = cv2.dilate(erosion2, kernel, iterations=<span class="number">4</span>)</span><br><span class="line">dilate3 = cv2.dilate(erosion2, kernel, iterations=<span class="number">8</span>)</span><br><span class="line">dil = np.hstack((img, erosion2, dilate2))</span><br><span class="line">cv_show(<span class="string">&#x27;dilate&#x27;</span>, dil)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/dilate.jpg&#x27;</span>, dil)</span><br></pre></td></tr></table></figure>
-<p><img src="F:%5CpythonProject%5Cimage%5Cdilate.jpg" alt="dilate"></p>
-<h3 id="开运算和闭运算">开运算和闭运算</h3>
-<p>开运算：先腐蚀，在膨胀</p>
-<p>闭运算：先膨胀，再腐蚀</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">img_max = cv2.imread(<span class="string">&quot;image\Max.png&quot;</span>)</span><br><span class="line">opening = cv2.morphologyEx(img_max, cv2.MORPH_OPEN, kernel)</span><br><span class="line">closing = cv2.morphologyEx(img_max, cv2.MORPH_CLOSE, kernel)</span><br><span class="line">openclose = np.hstack((img_max, opening, closing))</span><br><span class="line">cv_show(<span class="string">&#x27;open and close&#x27;</span>, openclose)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/openclose.jpg&#x27;</span>, openclose)</span><br></pre></td></tr></table></figure>
-<p><img src="F:%5CpythonProject%5Cimage%5Copenclose.jpg" alt="openclose"></p>
-<h3 id="梯度运算">梯度运算</h3>
-<p>梯度运算 = 腐蚀 - 膨胀</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">gradient = cv2.morphologyEx(img, cv2.MORPH_GRADIENT, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">gra = np.hstack((img, erosion1, dilate1, gradient))</span><br><span class="line">cv_show(<span class="string">&#x27;gradient&#x27;</span>, gra)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/gradient.jpg&#x27;</span>, gra)</span><br></pre></td></tr></table></figure>
-<p><img src="F:%5CpythonProject%5Cimage%5Cgradient.jpg" alt="gradient"></p>
-<h3 id="礼帽和黑帽">礼帽和黑帽</h3>
-<p>礼帽 ：原始输入 - 开运算结果</p>
-<p>黑帽 ： 闭运算 - 原始输入</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tophat = cv2.morphologyEx(img_max, cv2.MORPH_TOPHAT, kernel)</span><br><span class="line">blackhat = cv2.morphologyEx(img_max, cv2.MORPH_BLACKHAT, kernel)</span><br><span class="line">hat = np.hstack((img_max, tophat, blackhat))</span><br><span class="line">cv_show(&#x27;hat&#x27;, hat)</span><br><span class="line">cv2.imwrite(&#x27;image/hat.jpg&#x27;, hat)</span><br></pre></td></tr></table></figure>
-<p><img src="F:%5CpythonProject%5Cimage%5Chat.jpg" alt="hat"></p>
-]]></content>
-      <categories>
-        <category>opencv</category>
-        <category>day 4</category>
       </categories>
       <tags>
         <tag>opencv</tag>
@@ -324,6 +288,42 @@ cv2.THRESH_TOZERO_INV THRESH_TOZERO的反转</p>
       </tags>
   </entry>
   <entry>
+    <title>OpenCV-Day4</title>
+    <url>/2022/01/11/OpenCV-Day4/</url>
+    <content><![CDATA[<p>每天学习opencv - day4</p>
+<span id="more"></span>
+<h2 id="形态学">形态学</h2>
+<h3 id="腐蚀操作">腐蚀操作</h3>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 内核，定义边界范围[3,3]矩阵</span></span><br><span class="line">kernel = np.ones((<span class="number">10</span>,<span class="number">10</span>), np.uint8)</span><br><span class="line"><span class="comment"># 腐蚀函数</span></span><br><span class="line">erosion1 = cv2.erode(img, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">erosion2 = cv2.erode(img, kernel, iterations=<span class="number">4</span>)</span><br><span class="line">erosion3 = cv2.erode(img, kernel, iterations=<span class="number">8</span>)</span><br><span class="line">res = np.hstack((img, erosion1, erosion2, erosion3))</span><br><span class="line">cv_show(<span class="string">&#x27;res&#x27;</span>, res)</span><br></pre></td></tr></table></figure>
+<p><img src="F:%5CpythonProject%5Cimage%5Cerosion.jpg" alt="erosion"></p>
+<h3 id="膨胀操作">膨胀操作</h3>
+<p>膨胀操作就是腐蚀操作的反向</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">dilate1 = cv2.dilate(erosion2, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">dilate2 = cv2.dilate(erosion2, kernel, iterations=<span class="number">4</span>)</span><br><span class="line">dilate3 = cv2.dilate(erosion2, kernel, iterations=<span class="number">8</span>)</span><br><span class="line">dil = np.hstack((img, erosion2, dilate2))</span><br><span class="line">cv_show(<span class="string">&#x27;dilate&#x27;</span>, dil)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/dilate.jpg&#x27;</span>, dil)</span><br></pre></td></tr></table></figure>
+<p><img src="F:%5CpythonProject%5Cimage%5Cdilate.jpg" alt="dilate"></p>
+<h3 id="开运算和闭运算">开运算和闭运算</h3>
+<p>开运算：先腐蚀，在膨胀</p>
+<p>闭运算：先膨胀，再腐蚀</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">img_max = cv2.imread(<span class="string">&quot;image\Max.png&quot;</span>)</span><br><span class="line">opening = cv2.morphologyEx(img_max, cv2.MORPH_OPEN, kernel)</span><br><span class="line">closing = cv2.morphologyEx(img_max, cv2.MORPH_CLOSE, kernel)</span><br><span class="line">openclose = np.hstack((img_max, opening, closing))</span><br><span class="line">cv_show(<span class="string">&#x27;open and close&#x27;</span>, openclose)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/openclose.jpg&#x27;</span>, openclose)</span><br></pre></td></tr></table></figure>
+<p><img src="F:%5CpythonProject%5Cimage%5Copenclose.jpg" alt="openclose"></p>
+<h3 id="梯度运算">梯度运算</h3>
+<p>梯度运算 = 腐蚀 - 膨胀</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">gradient = cv2.morphologyEx(img, cv2.MORPH_GRADIENT, kernel, iterations=<span class="number">1</span>)</span><br><span class="line">gra = np.hstack((img, erosion1, dilate1, gradient))</span><br><span class="line">cv_show(<span class="string">&#x27;gradient&#x27;</span>, gra)</span><br><span class="line">cv2.imwrite(<span class="string">&#x27;image/gradient.jpg&#x27;</span>, gra)</span><br></pre></td></tr></table></figure>
+<p><img src="F:%5CpythonProject%5Cimage%5Cgradient.jpg" alt="gradient"></p>
+<h3 id="礼帽和黑帽">礼帽和黑帽</h3>
+<p>礼帽 ：原始输入 - 开运算结果</p>
+<p>黑帽 ： 闭运算 - 原始输入</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tophat = cv2.morphologyEx(img_max, cv2.MORPH_TOPHAT, kernel)</span><br><span class="line">blackhat = cv2.morphologyEx(img_max, cv2.MORPH_BLACKHAT, kernel)</span><br><span class="line">hat = np.hstack((img_max, tophat, blackhat))</span><br><span class="line">cv_show(&#x27;hat&#x27;, hat)</span><br><span class="line">cv2.imwrite(&#x27;image/hat.jpg&#x27;, hat)</span><br></pre></td></tr></table></figure>
+<p><img src="F:%5CpythonProject%5Cimage%5Chat.jpg" alt="hat"></p>
+]]></content>
+      <categories>
+        <category>opencv</category>
+        <category>day 4</category>
+      </categories>
+      <tags>
+        <tag>opencv</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>OpenCV-Day5</title>
     <url>/2022/01/12/OpenCV-Day5/</url>
     <content><![CDATA[<p>每天学习opencv - day5</p>
@@ -345,7 +345,7 @@ $$<br>
 $$<br>
 白到黑是负数， 黑到白就是正数，所有复数都会被截断成0</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 白到黑是负数， 黑到白就是正数，所有复数都会被截断成0，所以要求绝对值</span></span><br><span class="line">soblex = cv2.Sobel(img, cv2.CV_64F, <span class="number">1</span>, <span class="number">0</span>, ksize=<span class="number">3</span>)</span><br><span class="line">soblex = cv2.convertScaleAbs(soblex)</span><br><span class="line"><span class="comment"># cv_show(&#x27;soblex&#x27;, soblex)</span></span><br><span class="line"></span><br><span class="line">sobley = cv2.Sobel(img, cv2.CV_64F, <span class="number">0</span>, <span class="number">1</span>, ksize=<span class="number">3</span>)</span><br><span class="line">sobley = cv2.convertScaleAbs(sobley)</span><br><span class="line"><span class="comment"># cv_show(&#x27;sobley&#x27;, sobley)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 分别计算x,y，再求和</span></span><br><span class="line">soblexy = cv2.addWeighted(soblex, <span class="number">0.5</span>, sobley, <span class="number">0.5</span>, <span class="number">0</span>)</span><br><span class="line"><span class="comment"># cv_show(&#x27;soblexy&#x27;, soblexy)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 不建议直接计算</span></span><br><span class="line">soblexy1 = cv2.Sobel(img, cv2.CV_64F, <span class="number">1</span>, <span class="number">1</span>, ksize=<span class="number">3</span>)</span><br><span class="line">soblexy1 = cv2.convertScaleAbs(soblexy1)</span><br><span class="line"><span class="comment"># cv_show(&#x27;soblexy&#x27;, soblexy1)</span></span><br><span class="line"></span><br><span class="line">res = np.hstack((img, soblex, sobley, soblexy, soblexy1))</span><br><span class="line">cv_show(<span class="string">&#x27;res&#x27;</span>, res)</span><br></pre></td></tr></table></figure>
-<p><img src="F:%5CMyblog%5Cblog%5Csource_posts%5COpenCV-Day5%5C1.jpg" alt="soble"></p>
+<p><img src="F:%5CMyblog%5Cblog%5Csource_posts%5Cimage%5COpenCV-Day5%5C1.jpg" alt="1"></p>
 <h3 id="Scharr和Laplacian算子">Scharr和Laplacian算子</h3>
 <p>Scharr算子 ： 越近权重越大,更敏感</p>
 <p>Laplacian算子 ： 二阶导，对噪音点比较明显<br>
@@ -370,7 +370,7 @@ $$</p>
 \tag{Laplacian}<br>
 $$</p>
 <figure class="highlight python"><table><tr><td class="code"><pre><span class="line">scharrx = cv2.Scharr(img,cv2.CV_64F, <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">scharry = cv2.Scharr(img,cv2.CV_64F, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">scharrx = cv2.convertScaleAbs(scharrx)</span><br><span class="line">scharry = cv2.convertScaleAbs(scharry)</span><br><span class="line">scharrxy = cv2.addWeighted(scharrx, <span class="number">0.5</span>, scharry, <span class="number">0.5</span>, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">laplacian = cv2.Laplacian(img, cv2.CV_64F)</span><br><span class="line">laplacian = cv2.convertScaleAbs(laplacian)</span><br><span class="line"></span><br><span class="line">res1 = np.hstack((img, soblexy, scharrxy, laplacian))</span><br><span class="line">cv_show(<span class="string">&#x27;com&#x27;</span>, res1)</span><br></pre></td></tr></table></figure>
-<p><img src="F:%5CMyblog%5Cblog%5Csource_posts%5COpenCV-Day5%5C2.jpg" alt="2"></p>
+<p><img src="F:%5CMyblog%5Cblog%5Csource_posts%5Cimage%5COpenCV-Day5%5C2.jpg" alt="2"></p>
 ]]></content>
       <categories>
         <category>opencv</category>
