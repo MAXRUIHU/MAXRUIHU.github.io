@@ -651,6 +651,11 @@
   function initGate() {
     const gate = $("#gate");
     if (!gate) return;
+    // 若由服务端鉴权承载（serve.py 注入 <meta name="pe-auth">），跳过客户端弹窗
+    if (document.querySelector('meta[name="pe-auth"]')) {
+      gate.remove();
+      return;
+    }
     // 本会话已解锁则直接放行
     try {
       if (sessionStorage.getItem(GATE_SESSION_KEY) === "1") {

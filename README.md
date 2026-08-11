@@ -20,7 +20,7 @@ pe-dashboard/
 ├── scripts/
 │   ├── fetch_benchmarks.py    # 下载 A 股指数日线
 │   ├── clean_data.py          # 清洗管线（核心）
-│   └── serve.py               # 本地服务 + 动态更新 API
+│   └── serve.py               # 后端服务：真实鉴权(会话/Basic) + 动态更新 API
 ├── DATA_QUALITY_REPORT.md     # 每次清洗自动生成的质量报告
 └── requirements.txt
 ```
@@ -66,6 +66,62 @@ python3 scripts/serve.py --watch
 2. 运行 `python3 scripts/clean_data.py`（或 `serve.py --watch` 自动触发）；
 3. 刷新网页即可看到最新一期数据（前端每 10 分钟自动重新拉取；
    也可点击导航栏刷新按钮，或 `POST /api/update`）。
+
+
+## 真实登录鉴权（后端会话 / HTTP Basic Auth）
+
+> GitHub Pages 是纯静态托管，**无法**在服务端鉴权；需要把站点跑在能执行代码的后端上
+> （VPS、Render、Railway、Docker 等）。本项目后端 `scripts/serve.py` 内置真实鉴权，
+> 且会在鉴权生效时自动让前端跳过客户端弹窗（避免双重输入）。
+
+### 三种模式
+
+| 模式 | 说明 |
+|---|---|
+| `session`（推荐） | 登录页 + 签名会话 Cookie（HttpOnly/SameSite=Lax，HTTPS 自动加 Secure）；未登录访问任意页面 → 302 到 `/login`；**密码错误展示微信二维码** |
+| `basic` | HTTP Basic Auth（RFC 7617），浏览器原生弹窗；未认证返回 `401 + WWW-Authenticate` |
+| `off` | 不鉴权，仅本地开发 |
+
+### 本地启动（带鉴权）
+
+```bash
+PE_AUTH_MODE=session PE_AUTH_PASSWORD=你的密码 python3 scripts/serve.py --watch
+# 打开 http://127.0.0.1:8000/ → 先登录，密码错误会弹出微信二维码
+```
+
+### 安全特性
+
+- 密码不保存明文：启动时 PBKDF2-HMAC-SHA256 派生，常量时间比较
+- 会话 Cookie 签名（HMAC-SHA256），12 小时过期（`PE_AUTH_TTL` 可调）
+- 登录限流：同 IP 连续失败 5 次（`PE_AUTH_MAX_ATTEMPTS`）锁定 15 秒（`PE_AUTH_LOCKOUT`）
+- 除登录页与二维码图片外，所有资源（含 `data/dashboard_data.json`）均需登录
+- 环境变量配置：`PE_AUTH_MODE` / `PE_AUTH_PASSWORD` / `PE_AUTH_SECRET` / `PE_AUTH_TTL`
+  / `PE_AUTH_MAX_ATTEMPTS` / `PE_AUTH_LOCKOUT` / `PE_AUTH_USERNAME` / `PE_FORCE_SECURE`
+
+### 部署到服务器 / PaaS
+
+**Docker（任意 VPS）**
+```bash
+docker build -t pe-dashboard .
+docker run -d -p 8000:8000 -e PE_AUTH_MODE=session -e PE_AUTH_PASSWORD=你的密码   -e PE_FORCE_SECURE=1 --name pe-dashboard pe-dashboard
+```
+建议在前面加一层 Nginx/Caddy 反向代理提供 HTTPS（Caddy 自动证书示例）：
+```nginx
+# Caddyfile
+hurui.space {
+    reverse_proxy 127.0.0.1:8000
+}
+```
+
+**Render / Railway**
+- 连接本仓库，启动命令 `python3 scripts/serve.py --host 0.0.0.0`（或直接使用 `Procfile`）
+- 设置环境变量 `PE_AUTH_MODE=session`、`PE_AUTH_PASSWORD=...`、`PE_FORCE_SECURE=1`
+- 平台会分配 HTTPS 域名，再把 `hurui.space`（或子域名如 `app.hurui.space`）CNAME 指过去
+
+**域名切换**
+- 到 dnspod（当前 NS）把 `hurui.space` 的 CNAME 从 `maxruihu.github.io` 改为后端地址；
+- 或仅将 `app.hurui.space` 指向后端，主站仍保留 GitHub Pages。
+
 
 ## 部署到 GitHub Pages
 
