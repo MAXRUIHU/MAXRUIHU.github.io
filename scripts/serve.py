@@ -51,6 +51,8 @@ from urllib.parse import parse_qs, urlparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
 PUBLIC = os.path.join(ROOT, "public")
+if not os.path.isdir(PUBLIC):
+    PUBLIC = ROOT  # 兼容 github.io 仓库根目录即站点的部署形态
 SRC = os.path.normpath(os.path.join(ROOT, "..", "私募周报"))
 BENCH_SCRIPT = os.path.join(HERE, "fetch_benchmarks.py")
 CLEAN_SCRIPT = os.path.join(HERE, "clean_data.py")
