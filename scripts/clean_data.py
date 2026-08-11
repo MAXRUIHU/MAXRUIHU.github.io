@@ -356,23 +356,23 @@ def build_fund_panels(records: list[dict], weeks: list[dict]) -> tuple[list[dict
                 if prev is not None:
                     weekly[i] = (1 + ytd[i]) / (1 + prev) - 1
 
-        # 累计净值
+        # 累计净值（缺数据周 -> None，图表断开，不做平铺假象）
         nav_official = [None] * n_weeks
         nav_chained = [None] * n_weeks
         nav_excess = [None] * n_weeks
         cum = 1.0
         cum_ex = 1.0
         for i in range(n_weeks):
+            has_data = weekly[i] is not None or ytd[i] is not None
             if weekly[i] is not None:
                 cum *= (1 + weekly[i])
-            nav_chained[i] = round(cum, 6)
-            if ytd[i] is not None:
-                nav_official[i] = round(1 + ytd[i], 6)
-            else:
-                nav_official[i] = nav_chained[i]
+            if has_data:
+                nav_chained[i] = round(cum, 6)
+                nav_official[i] = round(1 + ytd[i], 6) if ytd[i] is not None else round(cum, 6)
             if weekly_ex[i] is not None:
                 cum_ex *= (1 + weekly_ex[i])
-            nav_excess[i] = round(cum_ex, 6)
+            if has_data:
+                nav_excess[i] = round(cum_ex, 6)
 
         # 统计指标
         wvals = [w for w in weekly if w is not None]
@@ -419,6 +419,13 @@ def build_fund_panels(records: list[dict], weeks: list[dict]) -> tuple[list[dict
         else:
             stats["sharpe_est"] = None
 
+        # 完整序列（29 周全勤）：官方今年收益 vs 当周收益复利偏差>2pp -> 源数据修正
+        complete = len(wks) == n_weeks and all(w is not None for w in weekly)
+        restated = bool(complete and nav_official[-1] is not None
+                        and nav_chained[-1] is not None
+                        and abs(nav_official[-1] - nav_chained[-1]) > 0.02)
+        incomplete = len(wks) < n_weeks
+
         # 与基准的逐周超额（面板阶段算好）
         excess_vs_bench = None  # 依赖 benchmark，留到 build 后补充
 
@@ -434,6 +441,8 @@ def build_fund_panels(records: list[dict], weeks: list[dict]) -> tuple[list[dict
             "last_week": wks[-1],
             "latest": latest,
             "stats": stats,
+            "restated": restated,
+            "incomplete": incomplete,
             "series": {
                 "weeks": wks,
                 "weekly": weekly,
@@ -651,7 +660,8 @@ def main():
         payload["funds"].append({
             **{k: f[k] for k in ("id", "strategy", "name", "institution", "suffix",
                                  "scale", "weeks_present", "first_week", "last_week",
-                                 "latest", "stats", "bench_key")},
+                                 "latest", "stats", "bench_key", "restated",
+                                 "incomplete")},
             "series": {
                 "weeks": f["series"]["weeks"],
                 "weekly": round_list(f["series"]["weekly"], 4),
