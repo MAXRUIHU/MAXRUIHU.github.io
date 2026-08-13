@@ -1,6 +1,0 @@
-# Caddy 自动 HTTPS 反向代理示例（VPS 上运行：caddy run）
-# 安装: apt install caddy  或  brew install caddy
-hurui.space {
-    reverse_proxy 127.0.0.1:8000
-    encode gzip
-}
