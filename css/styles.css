@@ -386,3 +386,7 @@ select.filter:focus { border-color: var(--accent); }
 .section-title { display: flex; align-items: baseline; gap: 10px; margin-top: 26px; margin-bottom: 4px; }
 .section-title h2 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
 .section-title .muted { font-size: 12px; }
+
+/* 新数据源：YTD 异常徽章 */
+.pill-amber { background: rgba(255,159,10,.16); color: #b25e00; }
+[data-theme="dark"] .pill-amber { background: rgba(255,159,10,.2); color: #ffb340; }

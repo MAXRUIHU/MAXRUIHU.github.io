@@ -1,9 +1,9 @@
 # 私募量化周刊 · 管理人业绩看板
 
-一个「数据 → 清洗 → 可视化 → 动态更新」的全栈小项目：从每周发布的《量化策略业绩周刊》
-Excel 中抽取私募管理人的周度涨跌幅，清洗为连贯的面板数据（自动剔除非交易日/休市周），
-并以 Apple 式审美的网页动态呈现，支持与 A 股大盘指数（沪深300 / 中证500 / 中证1000 /
-中证2000 / 红利 / 中证全指）同口径对比。
+一个「数据 → 清洗 → 可视化 → 动态更新」的全栈小项目：从「无鱼内参」周报 Excel 中
+抽取私募管理人的周度涨跌幅（24+ 策略分类，含 大厂/小厂 分档），清洗为连贯的面板数据，
+并以 Apple 式审美的网页动态呈现。基准指数由源数据自带（沪深300/中证500/中证1000/
+中证2000/中证全指/A500/南华商品/南华黄金等），无需外部下载。
 
 ## 目录结构
 
@@ -13,34 +13,35 @@ pe-dashboard/
 │   ├── index.html
 │   ├── css/styles.css
 │   ├── js/charts.js           # 零依赖 SVG 图表引擎
-│   ├── js/app.js              # SPA（hash 路由）
+│   ├── js/app.js              # SPA（hash 路由：时间/管理人筛选、对比、热力图）
 │   └── data/dashboard_data.json   # 清洗后的最终数据（自动生成）
 ├── data/
-│   └── benchmarks_raw.json    # 指数日线缓存（自动下载）
+│   └── dashboard_data.json     # 清洗后的最终数据（自动生成）
 ├── scripts/
-│   ├── fetch_benchmarks.py    # 下载 A 股指数日线
-│   ├── clean_data.py          # 清洗管线（核心）
+│   ├── clean_wuyu.py          # 无鱼数据清洗管线（核心）
 │   └── serve.py               # 后端服务：真实鉴权(会话/Basic) + 动态更新 API
+├── public/data/dashboard_data.json   # 页面数据源（自动生成）
 ├── DATA_QUALITY_REPORT.md     # 每次清洗自动生成的质量报告
 └── requirements.txt
 ```
 
-## 数据清洗管线（scripts/clean_data.py）
+## 数据清洗管线（scripts/clean_wuyu.py）
 
-针对 29 期周报的异构格式做了系统化处理：
+数据源为「无鱼内参」周报（`私募周报/无鱼/无鱼内参XXX-*.xlsx`，30 期，每期 24+ 策略 sheet），
+针对其异构格式做了系统化处理：
 
-1. **统一异构表头**：7~8 个策略 sheet 列顺序/数量不一，按表头语义 + 值域校验自动映射。
-2. **修复错位列**：如 `20260209~0302 灵活对冲` 表头与数据整体错位一列，自动识别并重排。
-3. **剔除脏数据**：跳过「均值：百亿 / 平均值:未百亿」汇总行、重复 sheet「市场中性1」、
-   空行、极端异常值。
-4. **统一管理人身份**：`进化论·500中性` / `进化论|500中性` / `千象混合中性` / `蒙玺·1000`
-   等写法统一为 `机构·策略`，缺失后缀按同机构唯一后缀（或众数）补齐。
-5. **剔除非交易日**：以报告期为交易周网格——春节等休市周天然缺失、不产生数据点；
-   指数日线同样只取交易日，并按周收盘对齐。
-6. **构造连贯净值**：官方「今年收益」为主口径，缺失时用「当周收益」复利回填；
-   同时输出「复利净值」与「超额净值」供对照。
-7. **质量审计**：自动识别疑似净值重构/修正的序列（官方 YTD vs 复利偏差 > 2%），
-   输出 `DATA_QUALITY_REPORT.md`。
+1. **周序解析**：优先读取文件内日期 sheet（含 `2026.1.5-2026.1.9` 等变体），文件名兜底；
+   自动得到 30 个交易周（01.05~01.09 → 08.03~08.07）。
+2. **策略识别**：28 个策略分类（含 大厂/小厂/全部 分档；CTA/套利 等含「策略类型」子分类）。
+3. **列语义定位**：行 0 混合「列名 + 统计值 + 基准」成对布局，按标签定位 区间收益/YTD收益/
+   超额/回撤/统计块/基准。
+4. **基准指数**：直接采用每期源数据自带的指数周收益（沪深300/中证500/中证1000/中证2000/
+   中证全指/A500/南华商品/南华黄金），与真实行情一致，无需联网下载。
+5. **去重合并**：同一管理人同周多产品（如 量化多头(小厂) 勤远）取均值合并并记录 QA。
+6. **YTD 异常检测**：对连续在录周，若官方 YTD 隐含环比与「区间收益」偏差 >5pp，判定该周
+   YTD 异常并剔除（官方口径回退复利），避免净值曲线出现荒谬跳变；受影响的序列打「YTD异常」标。
+7. **净值构造**：默认「当周收益复利」口径（连贯、规避源数据 YTD 异常）；官方 YTD 可切换查看。
+8. **质量审计**：自动输出 `DATA_QUALITY_REPORT.md`（缺失、重复、极端值、YTD 异常分布等）。
 
 ## 快速开始
 
@@ -49,21 +50,18 @@ cd pe-dashboard
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# 1) 下载指数日线（需联网；已缓存可跳过）
-python3 scripts/fetch_benchmarks.py
+# 1) 清洗无鱼周报，生成 public/data/dashboard_data.json + DATA_QUALITY_REPORT.md
+python3 scripts/clean_wuyu.py
 
-# 2) 清洗并生成 public/data/dashboard_data.json + DATA_QUALITY_REPORT.md
-python3 scripts/clean_data.py
-
-# 3) 本地预览（--watch 监听周报目录，新文件自动重建）
+# 2) 本地预览（--watch 监听无鱼目录，新文件自动重建）
 python3 scripts/serve.py --watch
 # 打开 http://127.0.0.1:8000/
 ```
 
 ## 每周更新流程
 
-1. 把新一期《量化策略业绩周刊_YYYYMMDD-*.xlsx》放入 `私募周报/`；
-2. 运行 `python3 scripts/clean_data.py`（或 `serve.py --watch` 自动触发）；
+1. 把新一期《无鱼内参XXX-*.xlsx》放入 `私募周报/无鱼/`；
+2. 运行 `python3 scripts/clean_wuyu.py`（或 `serve.py --watch` 自动触发）；
 3. 刷新网页即可看到最新一期数据（前端每 10 分钟自动重新拉取；
    也可点击导航栏刷新按钮，或 `POST /api/update`）。
 
@@ -97,6 +95,26 @@ PE_AUTH_MODE=session PE_AUTH_PASSWORD=你的密码 python3 scripts/serve.py --wa
 - 除登录页与二维码图片外，所有资源（含 `data/dashboard_data.json`）均需登录
 - 环境变量配置：`PE_AUTH_MODE` / `PE_AUTH_PASSWORD` / `PE_AUTH_SECRET` / `PE_AUTH_TTL`
   / `PE_AUTH_MAX_ATTEMPTS` / `PE_AUTH_LOCKOUT` / `PE_AUTH_USERNAME` / `PE_FORCE_SECURE`
+
+
+### 一键部署脚本（推荐）
+
+仓库内已提供 `deploy.sh` / `update.sh` / `docker-compose.yml` / `.env.example` / `Caddyfile.example`：
+
+```bash
+# VPS 上执行一次
+git clone git@github.com:MAXRUIHU/MAXRUIHU.github.io.git pe-dashboard
+cd pe-dashboard
+cp .env.example .env && chmod 600 .env
+vi .env            # 设置 PE_AUTH_PASSWORD / PE_AUTH_SECRET
+./deploy.sh        # 构建并启动（重复执行 = 拉取最新代码并重建）
+
+# 每周更新（数据已由本地管线生成并推送到仓库后）
+./update.sh        # git pull + docker compose restart
+```
+
+HTTPS：把 `Caddyfile.example` 里的 `hurui.space` 反向代理到 `127.0.0.1:8000`，
+然后到 dnspod 把 `hurui.space` 的 CNAME 从 `maxruihu.github.io` 改为 VPS 地址即可。
 
 ### 部署到服务器 / PaaS
 

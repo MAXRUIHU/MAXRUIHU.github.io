@@ -53,9 +53,8 @@ ROOT = os.path.normpath(os.path.join(HERE, ".."))
 PUBLIC = os.path.join(ROOT, "public")
 if not os.path.isdir(PUBLIC):
     PUBLIC = ROOT  # 兼容 github.io 仓库根目录即站点的部署形态
-SRC = os.path.normpath(os.path.join(ROOT, "..", "私募周报"))
-BENCH_SCRIPT = os.path.join(HERE, "fetch_benchmarks.py")
-CLEAN_SCRIPT = os.path.join(HERE, "clean_data.py")
+SRC = os.path.normpath(os.path.join(ROOT, "..", "私募周报", "无鱼"))
+CLEAN_SCRIPT = os.path.join(HERE, "clean_wuyu.py")
 
 AUTH_MODE = os.environ.get("PE_AUTH_MODE", "off").strip().lower()
 AUTH_PASSWORD = os.environ.get("PE_AUTH_PASSWORD", "")
@@ -142,13 +141,11 @@ def run(cmd):
 
 
 def rebuild(fetch_bench=True):
+    """重建数据：运行无鱼数据清洗管线（基准指数由源数据自带，无需联网下载）。"""
     t0 = time.time()
-    ok = True
-    if fetch_bench:
-        ok, _ = run([sys.executable, BENCH_SCRIPT])
-    ok2, r2 = run([sys.executable, CLEAN_SCRIPT])
-    return ok and ok2, {"elapsed": round(time.time() - t0, 1),
-                        "clean": r2.stdout.strip().splitlines()[-3:]}
+    ok, r = run([sys.executable, CLEAN_SCRIPT])
+    return ok, {"elapsed": round(time.time() - t0, 1),
+                "clean": r.stdout.strip().splitlines()[-3:]}
 
 
 LOGIN_PAGE = """<!DOCTYPE html>

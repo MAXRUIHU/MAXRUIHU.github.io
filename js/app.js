@@ -28,7 +28,7 @@
     view: "overview", params: {},
     period: { start: 0, end: 28 },     // 周索引区间（时间筛选）
     managers: new Set(),               // 机构名集合（管理人筛选）
-    minWeeks: 0,                       // 最低在录周数
+    minWeeks: 4,                       // 最低在录周数（默认过滤过短期序列）
   };
 
   /* ---------- 数据加载 ---------- */
@@ -84,6 +84,9 @@
     return vals.map((v, i) => (i < p.start || i > p.end || v == null) ? null : v / base - 1);
   }
   function periodExcess(fund, p, benchKey) {
+    // 优先用源数据「区间超额收益」复利口径；缺失时退回 净值/基准
+    const wex = fund.series.weekly_ex;
+    if (wex && wex.some(v => v != null)) return chainReturn(wex, p);
     const fnav = fund.series.nav_chained, b = DATA.benchmarks[benchKey];
     if (!b) return null;
     const bnav = b.nav;
@@ -251,7 +254,7 @@
       </div>`;
     }).join("");
 
-    const stratCards = meta.strategies.map(s => {
+    const stratCards = meta.strategies.map((s, si) => {
       const info = DATA.strategy_summary[s];
       if (!info) return "";
       const benchKey = meta.bench_strategies[s];
@@ -268,7 +271,7 @@
           <span>${pctStr(fs.length ? info.median_weekly[last_week_idx(info)] : null, 2)}</span>
           <span>${fs.length} 家${state.managers.size ? "（已筛）" : ""}</span>
         </div>
-        <div class="spark" id="spark-strat-${esc(s)}"></div>
+        <div class="spark" id="spark-strat-${si}"></div>
       </a>`;
     }).join("");
 
@@ -346,8 +349,8 @@
         const el = $(`#spark-${k}`);
         if (el) Sparkline(el, sl(b.nav, p), upDownColor(chainReturn(b.weekly, p)));
       });
-      meta.strategies.forEach(s => {
-        const el = $(`#spark-strat-${esc(s)}`);
+      meta.strategies.forEach((s, si) => {
+        const el = document.getElementById(`spark-strat-${si}`);
         const info = DATA.strategy_summary[s];
         if (el && info) Sparkline(el, sl(info.nav_equal_weight, p), "var(--accent)");
       });
@@ -358,9 +361,12 @@
   function emptyRow(n) { return `<tr><td colspan="${n}" class="empty" style="padding:26px">无数据</td></tr>`; }
   function upDownColor(v) { return v != null && v < 0 ? "var(--down)" : "var(--up)"; }
   function badge(f) {
-    if (f.restated) return ` <span class="pill pill-warn" title="官方今年收益与当周收益复利偏差>2%，疑为源数据中途修正">修正</span>`;
-    if (f.incomplete) return ` <span class="pill pill-soft" title="该序列存在缺周，累计口径为官方今年收益">${f.weeks_present}/29周</span>`;
-    return "";
+    const n = DATA.meta.weeks.length;
+    const parts = [];
+    if (f.ytd_unreliable) parts.push(`<span class="pill pill-amber" title="源数据该序列存在 YTD 与区间收益不符的周（已自动剔除异常周，官方口径回退复利）">YTD异常</span>`);
+    if (f.restated) parts.push(`<span class="pill pill-warn" title="官方 YTD 与复利偏差>2%">修正</span>`);
+    if (f.incomplete) parts.push(`<span class="pill pill-soft" title="该序列存在缺周">${f.weeks_present}/${n}周</span>`);
+    return parts.length ? " " + parts.join(" ") : "";
   }
 
   /* ---------- 热力图 ---------- */
@@ -638,7 +644,7 @@
           <div class="card card-pad">
             <div class="card-head">
               <div><h3>累计净值</h3><div class="card-sub" id="nav-sub">官方今年收益口径 · 区间起点归一为 0%</div></div>
-              <div class="seg" id="nav-mode"><button data-m="official" class="active">官方</button><button data-m="chained">复利</button></div>
+              <div class="seg" id="nav-mode"><button data-m="chained" class="active">复利</button><button data-m="official">官方</button></div>
             </div>
             <div class="toolbar" style="margin-bottom:0">
               <select id="bench-select" class="filter">
@@ -682,15 +688,15 @@
 
     // 净值图
     const modeBtns = $$("#nav-mode button");
-    let navMode = "official";
+    let navMode = "chained";
     function drawNav() {
       const bk = $("#bench-select").value;
       const b = bk ? DATA.benchmarks[bk] : null;
       const src = navMode === "official" ? f.series.nav_official : f.series.nav_chained;
-      const series = [{ name: f.name + (navMode === "official" ? "（官方）" : "（复利）"), values: rebase(src, p), color: "#0071e3", area: true }];
+      const series = [{ name: f.name + (navMode === "official" ? "（官方YTD）" : "（当周收益复利）"), values: rebase(src, p), color: "#0071e3", area: true }];
       if (b) series.push({ name: b.name, values: rebase(b.nav, p), color: "#ff9f0a", dash: true });
       new LineChart($("#chart-nav"), { series, labels, height: 310, base: 0 });
-      $("#nav-sub").textContent = (navMode === "official" ? "官方今年收益口径" : "当周收益复利口径") + " · 区间起点归一为 0%";
+      $("#nav-sub").textContent = (navMode === "official" ? "官方今年收益口径（异常周已剔除）" : "当周收益复利口径（默认，规避源数据 YTD 异常）") + " · 区间起点归一为 0%";
     }
     modeBtns.forEach(b => b.addEventListener("click", () => {
       modeBtns.forEach(x => x.classList.remove("active"));
