@@ -896,7 +896,7 @@
         <div class="card card-pad qa-block" style="margin-top:16px">
           <div class="card-head"><div><h3>清洗处理记录</h3><div class="card-sub">${qa.notes.length} 条自动处理</div></div></div>
           <ul class="qa-list">${qa.notes.slice(0, 40).map(n => `
-            <li><span class="qa-tag">${esc(typeNames[n.type] || n.type)}</span><span>${esc(n.file || "")} ${esc(n.sheet || "")} ${esc(n.detail)}</span></li>`).join("") || "<li class='muted'>无</li>"}
+            <li><span class="qa-tag">${esc(typeNames[n.type] || n.type)}</span><span>${esc(n.week || "")} ${esc(n.sheet || "")} ${esc(n.detail)}</span></li>`).join("") || "<li class='muted'>无</li>"}
           </ul>
         </div>
       </section>`;
