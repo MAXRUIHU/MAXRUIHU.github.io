@@ -285,17 +285,218 @@ select.filter:focus { border-color: var(--accent); }
 .qa-list li:last-child { border-bottom: none; }
 .qa-tag { font-size: 10.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px; flex-shrink: 0; }
 
-/* ---------- 响应式 ---------- */
+/* ============================================================
+   响应式（移动端适配）
+   ============================================================ */
+
+/* ---- 平板 & 中等屏 (≤980px) ---- */
+@media (max-width: 980px) {
+  .nav-inner { gap: 12px; }
+  .nav-links { margin-left: 4px; }
+  .update-chip { padding: 4px 9px; font-size: 11px; }
+  .card-pad { padding: 18px; }
+  .hero h1 { letter-spacing: -0.02em; }
+  .hero .sub { font-size: 14.5px; }
+  .grid-6 { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---- 平板小 / 手机大 (≤760px) ---- */
 @media (max-width: 760px) {
-  .main { padding: 18px 14px 50px; }
-  .nav-inner { padding: 0 14px; gap: 10px; }
+  :root { --nav-h: 50px; }
+  .main { padding: 16px 14px 56px; }
+  .footer { padding: 22px 14px 36px; }
+
+  .nav-inner { padding: 0 14px; gap: 8px; }
+  .brand-text { font-size: 14px; gap: 6px; }
   .brand-text em { display: none; }
   .update-chip { display: none; }
-  .detail-title { font-size: 26px; }
+  .nav-tools { gap: 6px; }
+  .icon-btn { width: 30px; height: 30px; }
+
+  .hero { padding: 18px 0 14px; }
+  .hero h1 { font-size: clamp(24px, 7vw, 32px); }
+  .hero .sub { font-size: 13.5px; }
+  .hero .tag-row { margin-top: 12px; gap: 6px; }
+  .tag { font-size: 11.5px; padding: 4px 10px; }
+
+  .card-pad { padding: 16px; }
+  .card .card-sub { font-size: 12px; }
+
+  /* 网格塌缩 */
+  .grid-6, .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 12px; }
+
+  /* KPI 卡片：小屏更紧凑 */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .kpi { padding: 12px 14px; }
+  .kpi .value { font-size: 19px; }
+  .kpi .label { font-size: 11px; }
+  .kpi .hint { font-size: 10.5px; }
+
+  /* 详情头 */
+  .detail-head { gap: 10px; padding: 4px 0 14px; }
+  .detail-title { font-size: 22px; gap: 8px; }
+  .crumb { font-size: 12px; }
+
+  /* 指数快照 */
+  .idx-card { padding: 14px 16px; }
+  .idx-card .val { font-size: 20px; }
+
+  /* 策略卡 */
+  .strategy-card { padding: 16px; }
+  .strategy-card .big { font-size: 22px; }
+  .strategy-card .name { font-size: 15px; }
+  .strategy-card .meta { gap: 10px; font-size: 11.5px; }
+
+  /* 表格 */
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+  table.data-table { font-size: 12.5px; }
+  .data-table th { padding: 9px 10px; font-size: 11px; }
+  .data-table td { padding: 9px 10px; }
+
+  /* 筛选栏 / 工具栏：纵向堆叠、全宽 */
+  .filterbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 14px; }
+  .fb-group { width: 100%; }
+  .fb-group .fb-label { flex-shrink: 0; }
+  .fb-group .seg { width: 100%; display: flex; }
+  .fb-group .seg button { flex: 1; padding: 7px 6px; font-size: 12px; }
+  .fb-group .filter,
+  .fb-group .fb-input { width: 100%; max-width: none; }
+  .fb-chips { width: 100%; }
+  .fb-compare { width: 100%; text-align: center; }
+
+  .toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .toolbar .search { max-width: none; width: 100%; }
+  .toolbar .seg { width: 100%; display: flex; }
+  .toolbar .seg button { flex: 1; }
+  .toolbar select.filter { width: 100%; }
+
+  /* 区段标题 */
+  .section-title { margin-top: 22px; gap: 8px; flex-wrap: wrap; }
+  .section-title h2 { font-size: 17px; }
+
+  /* 图表标题 */
+  .card-head { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .card-head .seg { align-self: stretch; display: flex; }
+  .card-head .seg button { flex: 1; }
+
+  /* 数据质量页 */
+  .qa-list li { font-size: 12.5px; gap: 8px; padding: 8px 0; }
+  .qa-tag { font-size: 10px; padding: 2px 6px; }
+
+  /* Toast */
+  .toast { bottom: 18px; padding: 10px 16px; font-size: 12.5px; max-width: calc(100vw - 32px); }
+
+  /* 密码门禁 */
+  .gate { padding: 14px; }
+  .gate-card { padding: 30px 22px 24px; border-radius: 20px; }
+  .gate-icon { width: 56px; height: 56px; margin-bottom: 14px; }
+  .gate-card h2 { font-size: 20px; }
+  .gate-qr img { width: 150px; }
 }
+
+/* ---- 中等手机 (≤560px) ---- */
 @media (max-width: 560px) {
-  .nav-links { margin-left: 0; }
+  .nav-links { margin-left: 0; gap: 2px; }
   .nav-link { padding: 5px 9px; font-size: 12.5px; }
+
+  .card-pad { padding: 14px; }
+  .strategy-card { padding: 14px; }
+
+  .filterbar { padding: 12px; }
+  .fb-group .seg button { font-size: 11.5px; padding: 6px 4px; }
+
+  .qa-list li { font-size: 12px; }
+}
+
+/* ---- 小屏手机 (≤480px) ---- */
+@media (max-width: 480px) {
+  :root { --nav-h: 48px; --radius: 14px; --radius-sm: 10px; }
+
+  .main { padding: 12px 12px 48px; }
+
+  .nav-inner { padding: 0 12px; gap: 6px; }
+  .brand-mark svg { width: 22px; height: 22px; }
+  .brand-text { font-size: 13px; }
+  .nav-links { margin-left: 0; gap: 0; }
+  .nav-link { padding: 5px 8px; font-size: 12px; }
+  .nav-tools { gap: 4px; }
+  .icon-btn { width: 28px; height: 28px; }
+  .icon-btn svg { width: 16px; height: 16px; }
+
+  .hero { padding: 14px 0 10px; }
+  .hero h1 { font-size: clamp(20px, 7vw, 26px); line-height: 1.18; }
+  .hero .sub { font-size: 12.5px; margin-top: 8px; }
+
+  /* KPI 单列堆叠 */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .kpi { padding: 10px 12px; }
+  .kpi .label { font-size: 10.5px; }
+  .kpi .value { font-size: 17px; margin-top: 3px; }
+  .kpi .hint { font-size: 10px; }
+
+  /* 卡片再紧凑 */
+  .card-pad { padding: 12px; }
+  .card h3 { font-size: 14px; }
+
+  /* 指数 / 策略卡 */
+  .idx-card { padding: 12px 14px; }
+  .idx-card .name { font-size: 12px; }
+  .idx-card .val { font-size: 18px; }
+  .idx-card .chg { font-size: 11.5px; }
+
+  .strategy-card { padding: 14px 12px; gap: 2px; }
+  .strategy-card .big { font-size: 20px; margin-top: 6px; }
+  .strategy-card .name { font-size: 14px; }
+  .strategy-card .bench { font-size: 11px; }
+  .strategy-card .meta { gap: 8px; font-size: 11px; flex-wrap: wrap; }
+
+  /* 统计块 */
+  .stat-value { font-size: 20px; }
+  .stat-value.sm { font-size: 16px; }
+
+  /* 详情头 */
+  .detail-title { font-size: 19px; }
+  .crumb { font-size: 11.5px; }
+
+  /* 区段标题 */
+  .section-title { margin-top: 18px; }
+  .section-title h2 { font-size: 15.5px; }
+
+  /* 表格（保留横滑，但视觉更紧凑） */
+  table.data-table { font-size: 12px; }
+  .data-table th { padding: 8px 8px; font-size: 10.5px; }
+  .data-table td { padding: 8px 8px; }
+
+  /* 筛选 / 工具 */
+  .filterbar { padding: 10px; gap: 8px; }
+  .fb-group .seg button { font-size: 11px; padding: 5px 4px; }
+
+  /* Toast */
+  .toast { font-size: 12px; padding: 9px 14px; }
+
+  /* 密码门禁 */
+  .gate-card { padding: 26px 18px 22px; }
+  .gate-card h2 { font-size: 18px; }
+  .gate-sub { font-size: 12px; }
+  .gate-input-row { flex-direction: column; }
+  .gate-input-row .gate-input { width: 100%; }
+  .gate-btn { padding: 11px; }
+  .gate-qr img { width: 140px; }
+
+  /* 页脚 */
+  .footer p { font-size: 11.5px; }
+}
+
+/* ---- 极小屏 (≤380px) ---- */
+@media (max-width: 380px) {
+  .nav-link { padding: 4px 6px; font-size: 11.5px; }
+  .brand-text { font-size: 12.5px; }
+  .hero h1 { font-size: 19px; }
+  .kpi .value { font-size: 16px; }
+  .strategy-card .big { font-size: 18px; }
+  .gate-card { padding: 22px 14px 18px; border-radius: 16px; }
 }
 
 /* ============================================================
@@ -390,3 +591,24 @@ select.filter:focus { border-color: var(--accent); }
 /* 新数据源：YTD 异常徽章 */
 .pill-amber { background: rgba(255,159,10,.16); color: #b25e00; }
 [data-theme="dark"] .pill-amber { background: rgba(255,159,10,.2); color: #ffb340; }
+
+/* ============================================================
+   热力图横向滚动（小屏）
+   ============================================================ */
+#heatmap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+#heatmap::-webkit-scrollbar { height: 6px; }
+#heatmap::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+#heatmap svg { display: block; min-width: 100%; }
+
+/* ============================================================
+   市场快照 4×2 紧凑网格
+   ============================================================ */
+.idx-grid { gap: 14px; }
+.idx-grid .idx-card { padding: 16px 18px; }
+@media (max-width: 980px) {
+  .idx-grid { grid-template-columns: repeat(2, 1fr); }
+}

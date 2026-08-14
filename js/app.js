@@ -299,7 +299,7 @@
         ${filterBar()}
 
         <div class="section-title"><h2>市场快照</h2><span class="muted">区间涨跌幅 · 点击进入市场页</span></div>
-        <div class="grid grid-6" style="margin-top:12px">${idxCards}</div>
+        <div class="grid grid-4 idx-grid" style="margin-top:12px">${idxCards}</div>
 
         <div class="section-title" style="margin-top:34px"><h2>策略表现</h2><span class="muted">区间等权收益 · 点击进入</span></div>
         <div class="grid grid-4" style="margin-top:12px">${stratCards}</div>
@@ -389,7 +389,11 @@
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    svg.style.width = "100%"; svg.style.height = "auto";
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", H);
+    svg.style.maxWidth = "100%";
+    svg.style.height = "auto";
+    svg.style.display = "block";
     const add = (tag, attrs) => { const el = document.createElementNS(svgNS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); svg.appendChild(el); return el; };
     // 行标签
     strats.forEach((s, r) => {
