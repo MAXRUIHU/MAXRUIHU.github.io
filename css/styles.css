@@ -108,6 +108,13 @@ input, select { font-family: inherit; }
   transition: all .2s ease;
 }
 .icon-btn:hover { color: var(--text); background: var(--border); transform: translateY(-1px); }
+.btn-mini {
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--border); background: transparent; color: var(--text-2);
+  font-size: 14px; line-height: 1; cursor: pointer; transition: all .2s ease;
+}
+.btn-mini:hover { color: var(--text); background: var(--border); }
+.fb-chips-source { display: flex; align-items: center; gap: 6px; }
 [data-theme="dark"] .icon-sun { display: block; }
 [data-theme="dark"] .icon-moon { display: none; }
 .icon-sun { display: none; }

@@ -26,16 +26,37 @@
   let DATA = null;
   const state = {
     view: "overview", params: {},
-    period: { start: 0, end: 28 },     // 周索引区间（时间筛选）
-    managers: new Set(),               // 机构名集合（管理人筛选）
-    minWeeks: 4,                       // 最低在录周数（默认过滤过短期序列）
+    period: { start: 0, end: 28 },     // 周索引区间（时间筛选，其他页面使用）
+    managers: new Set(),               // 机构名集合（管理人筛选；仅总览/策略/对比/明细页生效）
+    minWeeks: 4,                       // 最低在录周数（仅总览/策略/对比/明细页生效）
+    market: {
+      dim: "weekly",                   // A股市场页维度：daily | weekly | monthly | yearly
+      start: "",                       // 起（YYYY-MM-DD / YYYY-MM / YYYY，按维度切换）
+      end: "",                         // 止
+    },
   };
+  let MARKET_DAILY = null;             // 缓存 market_daily.json（{name, daily:[{date,ret,nav}]}）
 
   /* ---------- 数据加载 ---------- */
   async function loadData(force) {
     const res = await fetch("data/dashboard_data.json" + (force ? `?t=${Date.now()}` : ""));
     if (!res.ok) throw new Error("数据加载失败 " + res.status);
     return await res.json();
+  }
+
+  async function loadMarketDaily(force) {
+    if (MARKET_DAILY && !force) return MARKET_DAILY;
+    try {
+      const res = await fetch("data/market_daily.json" + (force ? `?t=${Date.now()}` : ""));
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const j = await res.json();
+      MARKET_DAILY = j && j.benchmarks ? j : { benchmarks: {}, generated_at: "" };
+    } catch (e) {
+      // 缺失时返回空集，UI 自动降级到 DATA.benchmarks 的 weekly
+      console.warn("market_daily.json 加载失败:", e.message);
+      MARKET_DAILY = { benchmarks: {}, generated_at: "", error: e.message };
+    }
+    return MARKET_DAILY;
   }
 
   function toast(msg) {
@@ -131,7 +152,7 @@
       switch (state.view) {
         case "strategy": return renderStrategy(app, state.params.name);
         case "fund": return renderFund(app, state.params.id);
-        case "market": return renderMarket(app);
+        case "market": return renderMarket(app, state.params);
         case "qa": return renderQA(app);
         case "compare": return renderCompare(app);
         default: return renderOverview(app);
@@ -714,53 +735,290 @@
   /* ============================================================
      A股市场页
      ============================================================ */
-  function renderMarket(app) {
-    const meta = DATA.meta, p = state.period;
-    const labels = sLabels();
-    const bm = DATA.benchmarks;
+  /* ============================================================
+     A 股市场页：日/周/月/年 维度切换 + 起止日期筛选
+     ============================================================ */
+
+  // 维度工具：把 daily 聚合成指定维度的 [{label, ret, nav}, ...]
+  // dim ∈ daily|weekly|monthly|yearly
+  function aggregateSeries(daily, dim) {
+    if (!Array.isArray(daily) || !daily.length) return [];
+    if (dim === "daily") {
+      return daily.map(d => ({ label: d.date, ret: d.ret, nav: d.nav }));
+    }
+    const groups = new Map(); // key -> {label, ret, nav, firstNav, lastNav, lastDate}
+    for (const d of daily) {
+      const dt = new Date(d.date + "T00:00:00");
+      let key, label;
+      if (dim === "weekly") {
+        // ISO 周：用日期作为 key + label(YYYY-MM-DD)
+        // 取每周一作为 label
+        const day = (dt.getDay() + 6) % 7; // 周一=0
+        const monday = new Date(dt); monday.setDate(dt.getDate() - day);
+        key = monday.toISOString().slice(0, 10);
+        label = key;
+      } else if (dim === "monthly") {
+        key = d.date.slice(0, 7); // YYYY-MM
+        label = key;
+      } else { // yearly
+        key = d.date.slice(0, 4); // YYYY
+        label = key;
+      }
+      if (!groups.has(key)) {
+        groups.set(key, { label, firstNav: d.nav / (1 + d.ret), lastNav: d.nav, lastDate: d.date, count: 1 });
+      } else {
+        const g = groups.get(key);
+        g.lastNav = d.nav;
+        g.lastDate = d.date;
+        g.count += 1;
+      }
+    }
+    const out = [];
+    for (const g of groups.values()) {
+      out.push({ label: g.label, ret: g.lastNav / g.firstNav - 1, nav: g.lastNav });
+    }
+    out.sort((a, b) => a.label < b.label ? -1 : 1);
+    return out;
+  }
+
+  // 按起止 label 过滤聚合序列（label 形如 YYYY-MM-DD / YYYY-MM / YYYY）
+  function sliceByLabel(arr, start, end) {
+    if (!start && !end) return arr;
+    return arr.filter(x => {
+      if (start && x.label < start) return false;
+      if (end && x.label > end) return false;
+      return true;
+    });
+  }
+
+  // 当前维度下，market 数据的可选取值范围（用于起止下拉）
+  function marketLabelRange(dim) {
+    const daily = (MARKET_DAILY && MARKET_DAILY.benchmarks) ? MARKET_DAILY.benchmarks : {};
+    const first = Object.values(daily)[0];
+    if (!first || !first.daily || !first.daily.length) return [];
+    if (dim === "daily") return first.daily.map(d => d.date);
+    const set = new Set();
+    for (const d of first.daily) {
+      if (dim === "weekly") {
+        const dt = new Date(d.date + "T00:00:00");
+        const day = (dt.getDay() + 6) % 7;
+        const monday = new Date(dt); monday.setDate(dt.getDate() - day);
+        set.add(monday.toISOString().slice(0, 10));
+      } else if (dim === "monthly") {
+        set.add(d.date.slice(0, 7));
+      } else {
+        set.add(d.date.slice(0, 4));
+      }
+    }
+    return [...set].sort();
+  }
+
+  // A 股市场页专用筛选栏：维度 + 起止（不再含管理人 / 在录）
+  function marketFilterBar() {
+    const m = state.market;
+    const dim = m.dim;
+    const labels = marketLabelRange(dim);
+    const total = labels.length;
+    // 默认起止 = 全量
+    if (!m.start || !labels.includes(m.start)) m.start = labels[0] || "";
+    if (!m.end || !labels.includes(m.end)) m.end = labels[total - 1] || "";
+
+    // 各维度的快捷预设
+    const presets = {
+      daily:   [{ k: "all", label: "全部" }, { k: "d60", label: "近60日" }, { k: "d120", label: "近120日" }, { k: "ytd", label: "今年" }],
+      weekly:  [{ k: "all", label: "全部" }, { k: "w4", label: "近4周" }, { k: "w8", label: "近8周" }, { k: "w12", label: "近12周" }, { k: "w26", label: "近半年" }],
+      monthly: [{ k: "all", label: "全部" }, { k: "m3", label: "近3月" }, { k: "m6", label: "近6月" }, { k: "ytd", label: "今年" }],
+      yearly:  [{ k: "all", label: "全部" }, { k: "ytd", label: "今年" }],
+    };
+
+    const dimLabel = { daily: "日", weekly: "周", monthly: "月", yearly: "年" }[dim];
+
+    return `
+      <div class="filterbar card" id="market-filterbar">
+        <div class="fb-group">
+          <span class="fb-label">维度</span>
+          <div class="seg" id="m-dim">
+            ${["daily", "weekly", "monthly", "yearly"].map(d => `
+              <button data-dim="${d}" class="${d === dim ? "active" : ""}">${dimLabelFor(d)}</button>
+            `).join("")}
+          </div>
+        </div>
+        <div class="fb-group">
+          <span class="fb-label">范围</span>
+          <div class="seg" id="m-presets">
+            ${presets[dim].map(p => `<button data-k="${p.k}">${p.label}</button>`).join("")}
+          </div>
+          <select id="m-start" class="filter" title="起">
+            ${labels.map(l => `<option value="${esc(l)}" ${l === m.start ? "selected" : ""}>${esc(l)}${l === m.end ? " 止" : ""}</option>`).join("")}
+          </select>
+          <span class="fb-sep">至</span>
+          <select id="m-end" class="filter" title="止">
+            ${labels.map(l => `<option value="${esc(l)}" ${l === m.end ? "selected" : ""}>${esc(l)}${l === m.start ? " 起" : ""}</option>`).join("")}
+          </select>
+        </div>
+        <div class="fb-group" style="margin-left:auto">
+          <span class="fb-label" style="color:var(--text-3)">数据源</span>
+          <span class="chip" style="cursor:default">akshare · ${MARKET_DAILY && MARKET_DAILY.generated_at ? MARKET_DAILY.generated_at.slice(0, 16) : "—"}</span>
+          <button class="btn-mini" id="m-refresh" title="重新拉取指数">↻</button>
+        </div>
+      </div>`;
+  }
+
+  function dimLabelFor(d) {
+    return { daily: "日", weekly: "周", monthly: "月", yearly: "年" }[d] || d;
+  }
+
+  // 应用预设（近 N 周期 / 今年）→ 改 m.start / m.end
+  function applyMarketPreset(key) {
+    const m = state.market;
+    const labels = marketLabelRange(m.dim);
+    if (!labels.length) return;
+    if (key === "all") { m.start = labels[0]; m.end = labels[labels.length - 1]; return; }
+    if (key === "ytd") {
+      const y = new Date().getFullYear();
+      const yrKey = String(y);
+      if (m.dim === "yearly") {
+        m.start = yrKey; m.end = yrKey;
+      } else if (m.dim === "monthly") {
+        m.start = yrKey + "-01"; m.end = yrKey + "-12";
+      } else if (m.dim === "daily") {
+        m.start = yrKey + "-01-01";
+        m.end = yrKey + "-12-31";
+      } else { // weekly
+        m.start = labels.find(l => l >= yrKey + "-01-01") || labels[0];
+        m.end = labels[labels.length - 1];
+      }
+      return;
+    }
+    const n = parseInt(key.slice(1), 10);
+    const idx0 = Math.max(0, labels.length - n);
+    m.start = labels[idx0];
+    m.end = labels[labels.length - 1];
+  }
+
+  function bindMarketFilterBar(host) {
+    const m = state.market;
+    $$("#m-dim button", host).forEach(b => b.addEventListener("click", () => {
+      m.dim = b.dataset.dim;
+      m.start = ""; m.end = ""; // 维度切换时重置
+      renderMarket(host.closest("#app") || host, {});
+    }));
+    $$("#m-presets button", host).forEach(b => b.addEventListener("click", () => {
+      applyMarketPreset(b.dataset.k);
+      renderMarket(host.closest("#app") || host, {});
+    }));
+    const start = $("#m-start", host), end = $("#m-end", host);
+    if (start) start.addEventListener("change", () => {
+      m.start = start.value;
+      if (m.end < m.start) m.end = m.start;
+      renderMarket(host.closest("#app") || host, {});
+    });
+    if (end) end.addEventListener("change", () => {
+      m.end = end.value;
+      if (m.start > m.end) m.start = m.end;
+      renderMarket(host.closest("#app") || host, {});
+    });
+    const r = $("#m-refresh", host);
+    if (r) r.addEventListener("click", async () => {
+      toast("重新拉取指数…");
+      await loadMarketDaily(true);
+      renderMarket(host.closest("#app") || host, {});
+    });
+  }
+
+  async function renderMarket(app, params) {
+    if (!MARKET_DAILY) await loadMarketDaily();
+    const m = state.market;
+    const dailyMap = (MARKET_DAILY && MARKET_DAILY.benchmarks) || {};
+    const weeklyMap = (DATA && DATA.benchmarks) || {};
+    const hasDaily = Object.keys(dailyMap).length > 0;
+
+    const labelsAll = marketLabelRange(m.dim);
+    if (!m.start) m.start = labelsAll[0] || "";
+    if (!m.end) m.end = labelsAll[labelsAll.length - 1] || "";
+
+    // 计算每个 benchmark 在当前维度的 series
+    const seriesMap = {};
+    let unionLabels = [];
+    const labelSet = new Set();
+    for (const [k, b] of Object.entries(weeklyMap)) {
+      let series;
+      if (hasDaily && dailyMap[k] && dailyMap[k].daily) {
+        series = aggregateSeries(dailyMap[k].daily, m.dim);
+      } else {
+        // 降级到 weeklyMap 的 weekly（仅当 dim=weekly，否则留空）
+        if (m.dim !== "weekly") { series = []; }
+        else {
+          series = (b.weekly || []).map((w, i) => ({
+            label: (DATA.meta.weeks[i] && DATA.meta.weeks[i].label) || ("W" + i),
+            ret: w, nav: (b.nav || [])[i],
+          }));
+        }
+      }
+      series = sliceByLabel(series, m.start, m.end);
+      seriesMap[k] = series;
+      for (const s of series) labelSet.add(s.label);
+    }
+    unionLabels = [...labelSet].sort();
+
     app.innerHTML = `
       <section class="page">
         <div class="crumb"><a href="#/">总览</a> / <span>A股市场</span></div>
         <div class="hero" style="padding-bottom:14px">
-          <h1>A 股大盘 · 周度对比</h1>
-          <p class="sub">六大指数区间起点归一，与私募策略同周网格对齐（剔除非交易日）。</p>
+          <h1>A 股大盘 · ${dimLabelFor(m.dim)}度对比</h1>
+          <p class="sub">六大指数${dimLabelFor(m.dim)}度对比 · 数据由 akshare 直接拉取 · 可按${dimLabelFor(m.dim)}切换粒度。</p>
         </div>
-        ${filterBar()}
+        ${marketFilterBar()}
         <div class="card card-pad" style="margin:14px 0 16px">
-          <div class="card-head"><div><h3>指数累计净值</h3><div class="card-sub">区间起点归一为 0%</div></div></div>
+          <div class="card-head"><div><h3>指数累计净值</h3><div class="card-sub">区间起点归一为 0% · ${unionLabels.length} 个${dimLabelFor(m.dim)}度点</div></div></div>
           <div id="chart-idx"></div>
         </div>
         <div class="grid grid-2">
           <div class="card card-pad">
-            <div class="card-head"><div><h3>指数周度收益</h3><div class="card-sub">选择下方指数查看</div></div></div>
+            <div class="card-head"><div><h3>指数${dimLabelFor(m.dim)}度收益</h3><div class="card-sub">选择下方指数查看</div></div></div>
             <div class="toolbar" style="margin-bottom:0">
-              <select id="idx-select" class="filter">${Object.entries(bm).map(([k, b]) => `<option value="${k}">${esc(b.name)}</option>`).join("")}</select>
+              <select id="idx-select" class="filter">${Object.keys(weeklyMap).map(k => `<option value="${esc(k)}">${esc(weeklyMap[k].name)}</option>`).join("")}</select>
             </div>
             <div id="chart-idx-weekly" style="margin-top:6px"></div>
           </div>
           <div class="card card-pad">
-            <div class="card-head"><div><h3>指数一览</h3><div class="card-sub">区间 & 今年以来</div></div></div>
+            <div class="card-head"><div><h3>指数一览</h3><div class="card-sub">区间收益 & 累计</div></div></div>
             <div class="table-wrap"><table class="data-table">
-              <thead><tr><th>指数</th><th>区间</th><th>今年</th><th>周数</th></tr></thead>
-              <tbody>${Object.entries(bm).map(([k, b]) => `
-                <tr><td>${esc(b.name)}</td><td>${pctSpan(chainReturn(b.weekly, p))}</td><td>${pctSpan(b.ytd_latest)}</td><td>${b.weekly.length}</td></tr>`).join("")}
+              <thead><tr><th>指数</th><th>区间收益</th><th>累计净值</th><th>${dimLabelFor(m.dim)}数</th><th>数据源</th></tr></thead>
+              <tbody>${Object.keys(weeklyMap).map(k => {
+                const s = seriesMap[k] || [];
+                let cum = 1;
+                for (const x of s) cum *= (1 + (x.ret || 0));
+                const period = cum - 1;
+                const src = (dailyMap[k] && dailyMap[k].daily) ? "akshare" : "xlsx";
+                return `<tr><td>${esc(weeklyMap[k].name)}</td><td>${pctSpan(period)}</td><td>${cum.toFixed(4)}</td><td>${s.length}</td><td><span class="pill pill-soft">${src}</span></td></tr>`;
+              }).join("")}
               </tbody>
             </table></div>
           </div>
         </div>
       </section>`;
 
-    bindFilterBar(app);
-    const series = Object.entries(bm).map(([k, b], i) => ({
-      name: b.name, values: rebase(b.nav, p), color: window.Charts.COLORS[i % 6], width: 2,
-    }));
-    new LineChart($("#chart-idx"), { series, labels, height: 360, base: 0 });
+    bindMarketFilterBar(app);
 
-    window.renderMarketWeekly = function (k) {
-      new BarChart($("#chart-idx-weekly"), { values: sl(bm[k].weekly, p), labels, height: 300 });
+    // 主图：归一化累计净值
+    const palette = (window.Charts && window.Charts.COLORS) || ["#0071e3","#ff9f0a","#bf5af2","#30d158","#ff453a","#64d2ff"];
+    const series = Object.keys(weeklyMap).map((k, i) => {
+      const s = seriesMap[k] || [];
+      const base = s.length ? s[0].nav : null;
+      const values = s.map(x => x.nav != null && base ? x.nav / base - 1 : null);
+      return { name: weeklyMap[k].name, values, color: palette[i % palette.length], width: 2 };
+    });
+    new LineChart($("#chart-idx"), { series, labels: unionLabels, height: 360, base: 0 });
+
+    // 单指数柱状
+    const drawIdxBar = (k) => {
+      const s = seriesMap[k] || [];
+      const vals = s.map(x => x.ret);
+      new BarChart($("#chart-idx-weekly"), { values: vals, labels: s.map(x => x.label), height: 300 });
     };
-    renderMarketWeekly(Object.keys(bm)[0]);
-    $("#idx-select").addEventListener("change", e => renderMarketWeekly(e.target.value));
+    drawIdxBar(Object.keys(weeklyMap)[0]);
+    $("#idx-select").addEventListener("change", e => drawIdxBar(e.target.value));
   }
 
   /* ============================================================
