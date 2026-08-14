@@ -1,6 +1,6 @@
 /* ============================================================
    app.js — 私募量化周刊看板 v2
-   特性：全局时间筛选 / 管理人筛选与对比 / 收益热力图 / 区间统计 / 数据质量标记
+   特性：全局时间筛选 / 管理人筛选与对比 / 区间统计 / 数据质量标记
    ============================================================ */
 (function () {
   "use strict";
@@ -277,12 +277,6 @@
 
     function last_week_idx(info) { return Math.max(p.start, Math.min(p.end, info.mean_weekly.length - 1)); }
 
-    const byPeriod = filtered
-      .map(f => ({ f, ret: chainReturn(f.series.weekly, p) }))
-      .filter(x => x.ret != null)
-      .sort((a, b) => b.ret - a.ret);
-    const top = byPeriod.slice(0, 12), bot = byPeriod.slice(-12).reverse();
-
     app.innerHTML = `
       <section class="page">
         <div class="hero">
@@ -304,43 +298,6 @@
         <div class="section-title" style="margin-top:34px"><h2>策略表现</h2><span class="muted">区间等权收益 · 点击进入</span></div>
         <div class="grid grid-4" style="margin-top:12px">${stratCards}</div>
 
-        <div class="section-title" style="margin-top:34px"><h2>策略 × 周度收益热力图</h2><span class="muted">等权周收益中位数（%）</span></div>
-        <div class="card card-pad" style="margin-top:12px">
-          <div id="heatmap"></div>
-        </div>
-
-        <div class="grid grid-2" style="margin-top:16px">
-          <div class="card card-pad">
-            <div class="card-head">
-              <div><h3>区间涨幅榜</h3><div class="card-sub">按所选区间复利收益 Top 12（已过滤异常/低周数）</div></div>
-            </div>
-            <div class="table-wrap">
-              <table class="data-table">
-                <thead><tr><th>管理人</th><th>策略</th><th>区间</th><th>今年</th><th>周数</th></tr></thead>
-                <tbody>${top.map(x => `
-                  <tr onclick="location.hash='#/fund/${encodeURIComponent(x.f.id)}'">
-                    <td>${esc(x.f.name)}${badge(x.f)}</td><td>${esc(x.f.strategy)}</td>
-                    <td>${pctSpan(x.ret)}</td><td>${pctSpan(x.f.latest.ytd)}</td><td>${x.f.weeks_present}</td>
-                  </tr>`).join("") || emptyRow(5)}</tbody>
-              </table>
-            </div>
-          </div>
-          <div class="card card-pad">
-            <div class="card-head">
-              <div><h3>区间跌幅榜</h3><div class="card-sub">按所选区间复利收益 Bottom 12</div></div>
-            </div>
-            <div class="table-wrap">
-              <table class="data-table">
-                <thead><tr><th>管理人</th><th>策略</th><th>区间</th><th>今年</th><th>周数</th></tr></thead>
-                <tbody>${bot.map(x => `
-                  <tr onclick="location.hash='#/fund/${encodeURIComponent(x.f.id)}'">
-                    <td>${esc(x.f.name)}${badge(x.f)}</td><td>${esc(x.f.strategy)}</td>
-                    <td>${pctSpan(x.ret)}</td><td>${pctSpan(x.f.latest.ytd)}</td><td>${x.f.weeks_present}</td>
-                  </tr>`).join("") || emptyRow(5)}</tbody>
-              </table>
-            </div>
-          </div>
-        </div>
       </section>`;
 
     bindFilterBar(app);
@@ -354,7 +311,6 @@
         const info = DATA.strategy_summary[s];
         if (el && info) Sparkline(el, sl(info.nav_equal_weight, p), "var(--accent)");
       });
-      renderHeatmap($("#heatmap"));
     });
   }
 
@@ -369,60 +325,6 @@
     return parts.length ? " " + parts.join(" ") : "";
   }
 
-  /* ---------- 热力图 ---------- */
-  function renderHeatmap(host) {
-    const p = state.period;
-    const strats = DATA.meta.strategies.filter(s => DATA.strategy_summary[s]);
-    const n = p.end - p.start + 1;
-    const idxs = sIdx();
-    // 数值范围
-    let mx = 0;
-    const grid = strats.map(s => idxs.map(i => {
-      const v = DATA.strategy_summary[s].median_weekly[i];
-      if (v != null) mx = Math.max(mx, Math.abs(v));
-      return v;
-    }));
-    const cap = Math.max(mx, 0.01);
-    const cellH = 30, cellW = Math.max(22, Math.min(30, 900 / n));
-    const labelW = 78;
-    const W = labelW + n * cellW + 40, H = strats.length * cellH + 34;
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    svg.setAttribute("width", W);
-    svg.setAttribute("height", H);
-    svg.style.maxWidth = "100%";
-    svg.style.height = "auto";
-    svg.style.display = "block";
-    const add = (tag, attrs) => { const el = document.createElementNS(svgNS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); svg.appendChild(el); return el; };
-    // 行标签
-    strats.forEach((s, r) => {
-      const t = add("text", { x: labelW - 8, y: r * cellH + 20, "text-anchor": "end", "font-size": 11.5, fill: "var(--text-2)" });
-      t.textContent = s;
-    });
-    // 列标签
-    idxs.forEach((i, c) => {
-      if (n <= 12 || c % 2 === 0 || c === n - 1) {
-        const t = add("text", { x: labelW + c * cellW + cellW / 2, y: H - 8, "text-anchor": "middle", "font-size": 9, fill: "var(--text-3)" });
-        t.textContent = DATA.meta.weeks[i].label;
-      }
-    });
-    // 单元格
-    grid.forEach((row, r) => row.forEach((v, c) => {
-      const x = labelW + c * cellW, y = r * cellH;
-      if (v == null) {
-        add("rect", { x, y, width: cellW - 1.5, height: cellH - 1.5, rx: 3, fill: "var(--border)", opacity: .35 });
-        return;
-      }
-      const a = Math.min(Math.abs(v) / cap, 1);
-      const color = v >= 0 ? `rgba(224,49,49,${0.08 + a * 0.85})` : `rgba(47,158,68,${0.08 + a * 0.85})`;
-      const rect = add("rect", { x, y, width: cellW - 1.5, height: cellH - 1.5, rx: 3, fill: color });
-      const t = add("text", { x: x + (cellW - 1.5) / 2, y: y + 19, "text-anchor": "middle", "font-size": 9.5, fill: "var(--text)" });
-      t.textContent = (v * 100).toFixed(1);
-    }));
-    host.innerHTML = "";
-    host.appendChild(svg);
-  }
 
   /* ============================================================
      策略页
