@@ -480,7 +480,7 @@
               </label>
               <select id="scale-filter" class="filter"><option value="">全部规模</option><option value="百亿">百亿</option><option value="未百亿">未百亿</option></select>
               <select id="sort-key" class="filter">
-                <option value="ret">按区间收益</option><option value="ytd">按今年收益</option>
+                <option value="ret">按区间收益</option><option value="ret_ann_geom">按年化收益</option><option value="ytd">按今年收益</option>
                 <option value="weekly">按本周收益</option><option value="excess">按区间超额</option>
                 <option value="vol">按区间波动</option><option value="mdd">按区间回撤</option>
                 <option value="sharpe">按夏普</option><option value="win_rate">按胜率</option>
@@ -491,7 +491,7 @@
             <table class="data-table" id="fund-table">
               <thead><tr>
                 <th data-k="name">管理人</th><th data-k="scale">规模</th>
-                <th data-k="ret">区间</th><th data-k="ytd">今年</th><th data-k="weekly">本周</th>
+                <th data-k="ret">区间</th><th data-k="ret_ann_geom">年化</th><th data-k="ytd">今年</th><th data-k="weekly">本周</th>
                 <th data-k="excess">区间超额</th><th data-k="ret_1y">近一年</th>
                 <th data-k="vol">区间波动</th><th data-k="mdd">区间回撤</th>
                 <th data-k="sharpe">夏普</th><th data-k="win_rate">胜率</th><th data-k="weeks_present">周数</th>
@@ -544,6 +544,7 @@
       return {
         id: f.id, name: f.name, scale: f.scale || "",
         ret: chainReturn(f.series.weekly, p),
+        ret_ann_geom: st.ret_ann_geom,
         ytd: lt.ytd, weekly: lt.weekly,
         excess: benchKey ? periodExcess(f, p, benchKey) : null,
         ret_1y: lt.ret_1y,
@@ -570,13 +571,13 @@
         <tr onclick="location.hash='#/fund/${encodeURIComponent(r.id)}'">
           <td>${esc(r.name)}${badge({ restated: r.restated, incomplete: r.incomplete, weeks_present: r.weeks_present })}</td>
           <td>${r.scale ? `<span class="pill pill-scale">${esc(r.scale)}</span>` : "—"}</td>
-          <td>${pctSpan(r.ret)}</td><td>${pctSpan(r.ytd)}</td><td>${pctSpan(r.weekly)}</td>
+          <td>${pctSpan(r.ret)}</td><td>${pctSpan(r.ret_ann_geom)}</td><td>${pctSpan(r.ytd)}</td><td>${pctSpan(r.weekly)}</td>
           <td>${pctSpan(r.excess)}</td><td>${pctSpan(r.ret_1y)}</td>
           <td>${r.vol != null ? (r.vol * 100).toFixed(1) + "%" : "—"}</td>
           <td>${pctSpan(r.mdd)}</td><td>${numStr(r.sharpe)}</td>
           <td>${r.win_rate != null ? (r.win_rate * 100).toFixed(0) + "%" : "—"}</td>
           <td>${r.weeks_present}</td>
-        </tr>`).join("") || emptyRow(12);
+        </tr>`).join("") || emptyRow(13);
       $("#strategy-sub").textContent = `共 ${fs.length} 家 · 筛选 ${list.length} 家 · 点击行进入详情`;
     }
     $("#fund-search").addEventListener("input", e => { q = e.target.value; draw(); });
@@ -630,6 +631,7 @@
           <div class="card kpi"><div class="label">今年收益</div><div class="value ${pctCls(lt.ytd)}">${pctStr(lt.ytd)}</div><div class="hint">官方口径</div></div>
           <div class="card kpi"><div class="label">本周收益</div><div class="value ${pctCls(lt.weekly)}">${pctStr(lt.weekly)}</div><div class="hint">最新一期</div></div>
           <div class="card kpi"><div class="label">区间年化波动</div><div class="value">${vol != null ? (vol * 100).toFixed(1) + "%" : "—"}</div><div class="hint">周收益估算</div></div>
+          <div class="card kpi"><div class="label">年化收益（几何）</div><div class="value ${pctCls(st.ret_ann_geom)}">${pctStr(st.ret_ann_geom)}</div><div class="hint">${f.weeks_present >= 8 ? `几何口径 · ${f.weeks_present} 周样本` : "样本不足(<8周) 不计算"}</div></div>
           <div class="card kpi"><div class="label">区间最大回撤</div><div class="value down">${pctStr(mdd)}</div><div class="hint">复利净值口径</div></div>
           <div class="card kpi"><div class="label">夏普 / 卡玛</div><div class="value">${numStr(lt.sharpe != null ? lt.sharpe : st.sharpe_est)} / ${numStr(lt.calmar)}</div></div>
           <div class="card kpi"><div class="label">周胜率</div><div class="value">${st.win_rate != null ? (st.win_rate * 100).toFixed(0) + "%" : "—"}</div><div class="hint">最佳 ${pctStr(st.best_week)} · 最差 ${pctStr(st.worst_week)}</div></div>
