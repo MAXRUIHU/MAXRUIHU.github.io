@@ -858,7 +858,15 @@
         </div>
         <div class="fb-group" style="margin-left:auto">
           <span class="fb-label" style="color:var(--text-3)">数据源</span>
-          <span class="chip" style="cursor:default">akshare · ${MARKET_DAILY && MARKET_DAILY.generated_at ? MARKET_DAILY.generated_at.slice(0, 16) : "—"}</span>
+          ${(() => {
+            const s = (MARKET_DAILY && MARKET_DAILY.source) || "";
+            const ts = (MARKET_DAILY && MARKET_DAILY.generated_at || "—").slice(0, 16);
+            const tag = s === "wind" ? '<span style="color:var(--accent);font-weight:700">Wind</span>'
+                       : s === "akshare+tencent+eastmoney" ? '<span style="color:var(--text-2);font-weight:700">AKShare 降级</span>'
+                       : '<span style="color:var(--text-3)">无数据</span>';
+            const dot = s === "wind" ? 'var(--up)' : 'var(--text-3)';
+            return `<span class="chip" style="cursor:default"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${dot};margin-right:6px"></span>${tag} · ${esc(ts)}</span>`;
+          })()}
           <button class="btn-mini" id="m-refresh" title="重新拉取指数">↻</button>
         </div>
       </div>`;
@@ -932,21 +940,25 @@
     const dailyMap = (MARKET_DAILY && MARKET_DAILY.benchmarks) || {};
     const weeklyMap = (DATA && DATA.benchmarks) || {};
     const hasDaily = Object.keys(dailyMap).length > 0;
+    const dailySrc = (MARKET_DAILY && MARKET_DAILY.source) || "";
+    const isWind = dailySrc === "wind";
+    const srcLabel = isWind ? "Wind" : (hasDaily ? "AKShare 降级" : "AKShare 兜底");
+    const srcTs = (MARKET_DAILY && MARKET_DAILY.generated_at || "").slice(0, 16);
 
     const labelsAll = marketLabelRange(m.dim);
     if (!m.start) m.start = labelsAll[0] || "";
     if (!m.end) m.end = labelsAll[labelsAll.length - 1] || "";
 
-    // 计算每个 benchmark 在当前维度的 series
+    // 计算每个 benchmark 在当前维度的 series + 数据源标记
     const seriesMap = {};
-    let unionLabels = [];
+    const srcMap = {};   // k -> "wind" | "akshare" | "xlsx"
     const labelSet = new Set();
     for (const [k, b] of Object.entries(weeklyMap)) {
       let series;
       if (hasDaily && dailyMap[k] && dailyMap[k].daily) {
         series = aggregateSeries(dailyMap[k].daily, m.dim);
+        srcMap[k] = isWind ? "wind" : "akshare";
       } else {
-        // 降级到 weeklyMap 的 weekly（仅当 dim=weekly，否则留空）
         if (m.dim !== "weekly") { series = []; }
         else {
           series = (b.weekly || []).map((w, i) => ({
@@ -954,25 +966,54 @@
             ret: w, nav: (b.nav || [])[i],
           }));
         }
+        srcMap[k] = "xlsx";  // 无 daily,fallback 路径(2000/南华系列)
       }
       series = sliceByLabel(series, m.start, m.end);
       seriesMap[k] = series;
       for (const s of series) labelSet.add(s.label);
     }
-    unionLabels = [...labelSet].sort();
+    const unionLabels = [...labelSet].sort();
+
+    // 区间涨跌幅榜:对每个指数算 cum,排序
+    const ranking = Object.keys(weeklyMap).map(k => {
+      const s = seriesMap[k] || [];
+      let cum = 1;
+      for (const x of s) cum *= (1 + (x.ret || 0));
+      return { name: weeklyMap[k].name, key: k, period: cum - 1, src: srcMap[k], n: s.length };
+    }).sort((a, b) => b.period - a.period);
+    const maxAbs = Math.max(0.01, ...ranking.map(r => Math.abs(r.period)));
+    const top3 = ranking.slice(0, 3);
+    const bot3 = ranking.slice(-3).reverse();
 
     app.innerHTML = `
       <section class="page">
         <div class="crumb"><a href="#/">总览</a> / <span>A股市场</span></div>
         <div class="hero" style="padding-bottom:14px">
           <h1>A 股大盘 · ${dimLabelFor(m.dim)}度对比</h1>
-          <p class="sub">六大指数${dimLabelFor(m.dim)}度对比 · 数据由 akshare 直接拉取 · 可按${dimLabelFor(m.dim)}切换粒度。</p>
+          <p class="sub">${weeklyMap && Object.keys(weeklyMap).length || 0} 个指数${dimLabelFor(m.dim)}度对比 · 数据源 <strong style="color:var(--accent)">${esc(srcLabel)}</strong> · 同步 ${esc(srcTs || "—")} · 维度 <strong>${dimLabelFor(m.dim)}</strong>${isWind ? " · Wind 终端已连通" : (hasDaily ? " · Wind 未连通,自动降级" : " · Wind 未连通且 AKShare 仅覆盖 5 个指数")}</p>
         </div>
         ${marketFilterBar()}
+
+        <!-- 区间涨跌幅榜 -->
+        <div class="card card-pad" style="margin-bottom:16px">
+          <div class="card-head"><div><h3>区间涨跌幅榜</h3><div class="card-sub">${esc(m.start || "起始")} → ${esc(m.end || "至今")} · 共 ${ranking.length} 个指数</div></div></div>
+          <div class="ranking-grid">
+            <div class="ranking-col">
+              <div class="ranking-head">领涨 Top ${Math.min(3, top3.length)}</div>
+              ${top3.map((r, i) => rankingRow(r, i + 1, maxAbs, true)).join("")}
+            </div>
+            <div class="ranking-col">
+              <div class="ranking-head">领跌 Top ${Math.min(3, bot3.length)}</div>
+              ${bot3.map((r, i) => rankingRow(r, ranking.length - i, maxAbs, false)).join("")}
+            </div>
+          </div>
+        </div>
+
         <div class="card card-pad" style="margin:14px 0 16px">
           <div class="card-head"><div><h3>指数累计净值</h3><div class="card-sub">区间起点归一为 0% · ${unionLabels.length} 个${dimLabelFor(m.dim)}度点</div></div></div>
           <div id="chart-idx"></div>
         </div>
+
         <div class="grid grid-2">
           <div class="card card-pad">
             <div class="card-head"><div><h3>指数${dimLabelFor(m.dim)}度收益</h3><div class="card-sub">选择下方指数查看</div></div></div>
@@ -985,14 +1026,14 @@
             <div class="card-head"><div><h3>指数一览</h3><div class="card-sub">区间收益 & 累计</div></div></div>
             <div class="table-wrap"><table class="data-table">
               <thead><tr><th>指数</th><th>区间收益</th><th>累计净值</th><th>${dimLabelFor(m.dim)}数</th><th>数据源</th></tr></thead>
-              <tbody>${Object.keys(weeklyMap).map(k => {
-                const s = seriesMap[k] || [];
-                let cum = 1;
-                for (const x of s) cum *= (1 + (x.ret || 0));
-                const period = cum - 1;
-                const src = (dailyMap[k] && dailyMap[k].daily) ? "akshare" : "xlsx";
-                return `<tr><td>${esc(weeklyMap[k].name)}</td><td>${pctSpan(period)}</td><td>${cum.toFixed(4)}</td><td>${s.length}</td><td><span class="pill pill-soft">${src}</span></td></tr>`;
-              }).join("")}
+              <tbody>${ranking.map(r => `
+                <tr>
+                  <td>${esc(r.name)}</td>
+                  <td>${pctSpan(r.period)}</td>
+                  <td>${(1 + r.period).toFixed(4)}</td>
+                  <td>${r.n}</td>
+                  <td><span class="pill ${srcPillClass(r.src)}">${srcDisplay(r.src)}</span></td>
+                </tr>`).join("")}
               </tbody>
             </table></div>
           </div>
@@ -1001,7 +1042,7 @@
 
     bindMarketFilterBar(app);
 
-    // 主图：归一化累计净值
+    // 主图:归一化累计净值(无数据的指数灰显或剔除)
     const palette = (window.Charts && window.Charts.COLORS) || ["#0071e3","#ff9f0a","#bf5af2","#30d158","#ff453a","#64d2ff"];
     const series = Object.keys(weeklyMap).map((k, i) => {
       const s = seriesMap[k] || [];
@@ -1019,6 +1060,29 @@
     };
     drawIdxBar(Object.keys(weeklyMap)[0]);
     $("#idx-select").addEventListener("change", e => drawIdxBar(e.target.value));
+  }
+
+  // 涨跌幅榜行渲染
+  function rankingRow(r, rank, maxAbs, isUp) {
+    const pct = Math.abs(r.period);
+    const barW = Math.min(100, (pct / maxAbs) * 100).toFixed(1);
+    const color = isUp ? "var(--up)" : "var(--down)";
+    const src = srcDisplay(r.src);
+    return `
+      <div class="rank-row">
+        <span class="rank-no">${rank}</span>
+        <span class="rank-name" title="${esc(r.name)}">${esc(r.name)}</span>
+        <span class="rank-bar"><span style="display:block;width:${barW}%;height:6px;border-radius:3px;background:${color}"></span></span>
+        <span class="rank-pct ${isUp ? "up" : "down"}">${pctStr(r.period, 2)}</span>
+        <span class="rank-src"><span class="pill ${srcPillClass(r.src)}" style="font-size:10px">${src}</span></span>
+      </div>`;
+  }
+
+  function srcDisplay(s) {
+    return s === "wind" ? "Wind" : (s === "akshare" ? "AKShare" : "xlsx");
+  }
+  function srcPillClass(s) {
+    return s === "wind" ? "pill-accent" : (s === "akshare" ? "pill-soft" : "pill-warn");
   }
 
   /* ============================================================

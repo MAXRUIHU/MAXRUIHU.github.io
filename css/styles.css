@@ -115,6 +115,27 @@ input, select { font-family: inherit; }
 }
 .btn-mini:hover { color: var(--text); background: var(--border); }
 .fb-chips-source { display: flex; align-items: center; gap: 6px; }
+
+/* 涨跌幅榜 */
+.ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.ranking-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ranking-head { font-size: 12px; font-weight: 700; color: var(--text-3); letter-spacing: .4px; padding-bottom: 4px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.rank-row { display: grid; grid-template-columns: 22px 1fr 70px 56px 70px; align-items: center; gap: 10px; padding: 6px 4px; border-radius: 8px; transition: background .15s; }
+.rank-row:hover { background: var(--card-2); }
+.rank-no { font-size: 12px; font-weight: 700; color: var(--text-3); text-align: center; }
+.rank-name { font-size: 13px; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-bar { display: block; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.rank-pct { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 12.5px; text-align: right; }
+.rank-pct.up { color: var(--up); }
+.rank-pct.down { color: var(--down); }
+.rank-src { display: flex; justify-content: flex-end; }
+@media (max-width: 800px) {
+  .ranking-grid { grid-template-columns: 1fr; }
+  .rank-row { grid-template-columns: 22px 1fr 50px 60px; }
+  .rank-src { display: none; }
+}
+
+.fb-chips-source { display: flex; align-items: center; gap: 6px; }
 [data-theme="dark"] .icon-sun { display: block; }
 [data-theme="dark"] .icon-moon { display: none; }
 .icon-sun { display: none; }
